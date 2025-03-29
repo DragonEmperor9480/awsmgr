@@ -1,5 +1,6 @@
 #!/bin/bash
 source scripts/colors
+source scripts/aws_iam_mgr
 
 while true; do
     echo -e "${RED} Welcome to AWS-CLI Manager${RESET}"
@@ -13,7 +14,7 @@ while true; do
     read -p "Choose: " main_num
 
     case $main_num in
-        1) echo "Test 1";;
+        1) aws_iam_mgr;;
         2) echo "Test 2";;
         3) echo "Test 3";;
         4) echo "Exiting...";break;;

@@ -1,0 +1,83 @@
+#!/bin/bash
+
+source scripts/colors
+
+function aws_iam_mgr(){
+    while true; do
+        echo -e "${GREEN}---------------------------------${RESET}"
+        echo -e "${BOLD}1) Create IAM User${RESET}"
+        echo -e "${BOLD}2) List Users${RESET}"
+        echo -e "${BOLD}3) Add User to a Group${RESET}"
+        echo -e "${BOLD}4) Delete User${RESET}"
+        echo -e "${BOLD}5) Create Groups${RESET}"
+        echo -e "${BOLD}6) List Groups${RESET}"
+        echo -e "${BOLD}7) Check Total Users in Group${RESET}"
+        echo -e "${BOLD}8) Delete Group${RESET}"
+        echo -e "${BOLD}9) Remove User from a Group${RESET}"
+        echo -e "${BOLD}10) Back to Main Menu${RESET}"
+        echo -e "${GREEN}---------------------------------${RESET}"
+            
+        read -p "Choose an option: " iam_num
+
+        case $iam_num in
+            1)
+            read -p "Enter Username for new IAM User:" iam_username
+            aws iam create-user --user-name "$iam_username" && \
+            echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
+            sleep 1
+            ;;
+            
+            2)
+            echo -e "${YELLOW}Fetching IAM Users...${RESET}"
+            aws iam list-users --query "Users[*].[UserName]" --output table 
+            read
+            ;;
+
+            3)
+            read -p "Enter Username:" iam_username
+            read -p "Enter Groupname:" iam_group
+            aws iam add-user-to-group --user-name "$iam_username" --group-name "$iam_group" && \
+            echo -e "${GREEN}Added '$iam_username' to '$iam_group' successfully!${RESET}"
+            sleep 1
+            ;; 
+
+            4)
+            read -p "Enter Username:" iam_username
+            aws iam delete-user --user-name "$iam_username"
+            ;;
+            5)
+            read -p "Enter Group Name: " iam_group
+            aws iam create-group --group-name "$iam_group" && \
+            echo -e "${GREEN}Group '$iam_group' created successfully!${RESET}"
+            sleep 1
+            ;;
+            6)
+            echo -e "${YELLOW}Fetching IAM Groups...${RESET}"
+            aws iam list-groups --query "Groups[*].[GroupName, CreateDate]" --output table
+            sleep 5
+            ;;
+            7)
+            read -p "Enter Group Name: " iam_group
+            aws iam get-group --group-name "$iam_group" --query "Users[*].[UserName]" --output table | less
+            ;;
+            8)
+            read -p "Enter Group Name: " iam_group
+            aws iam delete-group --group-name "$iam_group" && \
+            echo -e "${GREEN}Group '$iam_group' deleted successfully!${RESET}"
+            ;;
+            9)
+            read -p "Enter Username:" iam_username
+            read -p "Enter Groupname:" iam_group
+            aws iam remove-user-from-group --group-name "$iam_group" --user-name "$iam_username";;
+            10)
+            echo "Going back to Main Menu"
+            break;;
+            *)
+            echo "Invalid Input"
+            sleep 1
+            ;;
+        esac
+    done
+
+
+}
