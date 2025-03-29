@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Define colors
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+CYAN='\e[36m'
+BOLD='\e[1m'
+RESET='\e[0m'
