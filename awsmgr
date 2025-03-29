@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#Define colours 
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+CYAN='\e[36m'
+BOLD='\e[1m'
+RESET='\e[0m'
+
+while true; do
+    echo -e "${RED} Welcome to AWS-CLI Manager${RESET}"
+    echo "
+    Which Service you want to use?
+    1) IAM
+    2) EC2
+    3) S3
+    4) Exit"
+
+    read -p "Choose: " main_num
+
+    case $main_num in
+        1) echo "Test 1";;
+        2) echo "Test 2";;
+        3) echo "Test 3";;
+        4) echo "Exiting...";break;;
+        *) echo "Invalid Input"
+    esac
+done
