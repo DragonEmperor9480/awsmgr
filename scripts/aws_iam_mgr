@@ -21,10 +21,18 @@ function aws_iam_mgr(){
 
         case $iam_num in
             1)
-            read -p "Enter Username for new IAM User:" iam_username
-            aws iam create-user --user-name "$iam_username" && \
-            echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
-            sleep 1
+            read -p "Enter Username for new IAM User: " iam_username
+            output=$(aws iam create-user --user-name "$iam_username" 2>&1)
+
+            if echo "$output" | grep -q "EntityAlreadyExists"; then
+                echo -e "${BOLD}${RED}Error: User '$iam_username' already exists!${RESET}"
+            elif echo "$output" | grep -q "UserName"; then
+                echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
+            else
+                echo -e "${YELLOW}Unexpected error occurred:${RESET}"
+                echo "$output"
+            fi
+            read 
             ;;
             
             2)
