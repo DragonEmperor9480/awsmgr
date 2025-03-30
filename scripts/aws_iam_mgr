@@ -71,9 +71,7 @@ function aws_iam_mgr(){
             sleep 1
             ;;
             6)
-            echo -e "${YELLOW}Fetching IAM Groups...${RESET}"
-            aws iam list-groups --query "Groups[*].[GroupName, CreateDate]" --output table
-            sleep 5
+            aws_iam_list_groups
             ;;
             7)
             read -p "Enter Group Name: " iam_group
@@ -111,4 +109,17 @@ function aws_iam_list_users()
                 print "+------------+-------------------------+------------------------+";} 
         NR>3 {print}'    
 
+}
+
+function aws_iam_list_groups() {
+    echo -e "${BOLD}Fetching IAM Groups...${RESET}"
+    
+    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output table | 
+    sed 's/ListGroups/Groups/' | 
+    awk 'NR==3 {
+            print "+------------+------------------+------------------------+";
+            print "| Group Name |      Group ID    |      Created At       |";
+            print "+------------+------------------+------------------------+";
+         } 
+         NR>3 { print }'
 }
