@@ -2,8 +2,16 @@
 source scripts/colors
 source scripts/aws_iam_mgr
 
+clear
+
+# Print AWSMGR Header
+echo -e "${BOLD}${CYAN}==============================================${RESET}"
+echo -e "${BOLD}${BLUE}              AWSMGR - AWS CLI Manager        ${RESET}"
+echo -e "${BOLD}${CYAN}==============================================${RESET}"
+echo -e "${GREEN}🚀 Manage ALL AWS CLI functionalities in one place!${RESET}"
+echo ""
+
 while true; do
-    echo -e "${RED} Welcome to AWS-CLI Manager${RESET}"
     echo "
     Which Service you want to use?
     1) IAM
