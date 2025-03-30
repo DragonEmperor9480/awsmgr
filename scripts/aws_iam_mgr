@@ -36,14 +36,7 @@ function aws_iam_mgr(){
             ;;
             
             2)
-            echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
-            aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output table | 
-            sed 's/ListUsers/Users/' | 
-            awk 'NR==3{print "+------------+-------------------------+------------------------+"; 
-                        print "| Username   |       User ID           |      Created At       |"; 
-                        print "+------------+-------------------------+------------------------+";} 
-                NR>3 {print}'
-
+            aws_iam_list_users
             read
             ;;
 
@@ -56,8 +49,20 @@ function aws_iam_mgr(){
             ;; 
 
             4)
-            read -p "Enter Username:" iam_username
-            aws iam delete-user --user-name "$iam_username"
+            aws_iam_list_users
+            echo""
+            read -p " Enter username you want to delete: " iam_username
+            output=$(aws iam delete-user --user-name "$iam_username" 2>&1)
+            
+            if echo "$output" | grep -q "NoSuchEntity"; then
+                echo -e "${BOLD}${RED}Error: User '$iam_username' doesn't exist!${RESET}"
+            elif [ -z "$output" ]; then
+                echo -e "${BOLD}${GREEN}User '$iam_username' deleted successfully!${RESET}"
+            else
+                echo -e "${BOLD}${YELLOW}Unexpected error occurred:${RESET}"
+                echo "$output"
+            fi
+
             ;;
             5)
             read -p "Enter Group Name: " iam_group
@@ -93,5 +98,17 @@ function aws_iam_mgr(){
         esac
     done
 
+
+}
+
+function aws_iam_list_users()
+{
+    echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
+    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output table | 
+    sed 's/ListUsers/Users/' | 
+    awk 'NR==3{print "+------------+-------------------------+------------------------+"; 
+                print "| Username   |       User ID           |      Created At       |"; 
+                print "+------------+-------------------------+------------------------+";} 
+        NR>3 {print}'    
 
 }
