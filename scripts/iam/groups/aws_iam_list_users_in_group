@@ -1,0 +1,30 @@
+function aws_iam_list_users_in_group()
+{
+    aws_iam_list_groups  # Display available groups
+
+    read -p "Enter Group Name: " iam_group
+
+    # Check if the group name is empty
+    if [[ -z "$iam_group" ]]; then
+        echo -e "${BOLD}${RED}Error: Group name cannot be empty!${RESET}"
+        return
+    fi
+
+    # Check if the group exists
+    if ! aws iam get-group --group-name "$iam_group" &>/dev/null; then
+        echo -e "${BOLD}${RED}Error: Group '$iam_group' does not exist!${RESET}"
+        return
+    fi
+
+    # Fetch users in the group
+    echo -e "${BOLD}${GREEN}Fetching users in group '$iam_group'...${RESET}"
+    output=$(aws iam get-group --group-name "$iam_group" --query "Users[*].[UserName]" --output text)
+
+    # Check if the group has no users
+    if [[ -z "$output" ]]; then
+        echo -e "${BOLD}${YELLOW}No users found in group '$iam_group'.${RESET}"
+    else
+        echo -e "${BOLD}${GREEN}Users in group '$iam_group':${RESET}"
+        echo "$output" | awk '{print " - " $0}'  # Adds bullet points for better readability
+    fi
+}

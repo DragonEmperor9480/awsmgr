@@ -1,0 +1,56 @@
+#!/bin/bash
+
+function aws_iam_add_user_to_group()
+{
+# Fetch IAM users and groups side by side
+echo -e "${BOLD}Fetching IAM Users & Groups...${RESET}"
+
+# Get users and groups
+users=$(aws iam list-users --query "Users[*].[UserName]" --output text)
+groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
+
+# Convert to arrays
+user_array=($users)
+group_array=($groups)
+
+# Find max count
+user_count=${#user_array[@]}
+group_count=${#group_array[@]}
+max_count=$(( user_count > group_count ? user_count : group_count ))
+
+# Print table header
+echo "+------------+------------+"
+echo "|  Users     |  Groups    |"
+echo "+------------+------------+"
+
+# Print table rows
+for ((i = 0; i < max_count; i++)); do
+    user=${user_array[i]:-"      "}  # Empty space if no more users
+    group=${group_array[i]:-"      "}  # Empty space if no more groups
+    printf "| %-10s | %-10s |\n" "$user" "$group"
+done
+
+# Print table footer
+echo "+------------+------------+"
+
+# Prompt for input
+read -p "Enter Username: " iam_username
+read -p "Enter Groupname: " iam_group
+
+# Check if user exists
+if ! echo "${users}" | grep -qw "$iam_username"; then
+    echo -e "${BOLD}${RED}Error: User '$iam_username' not found!${RESET}"
+fi
+
+# Check if group exists
+if ! echo "${groups}" | grep -qw "$iam_group"; then
+    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
+fi
+
+# Add user to group
+if aws iam add-user-to-group --user-name "$iam_username" --group-name "$iam_group"; then
+    echo -e "${BOLD}${GREEN}User '$iam_username' successfully added to group '$iam_group'!${RESET}"
+else
+    echo -e "${BOLD}${RED}Error: Failed to add user '$iam_username' to group '$iam_group'.${RESET}"
+fi
+}

@@ -1,6 +1,20 @@
 #!/bin/bash
 
+#colors
 source scripts/colors
+
+#groups
+source scripts/iam/groups/aws_iam_create_group
+source scripts/iam/groups/aws_iam_delete_group
+source scripts/iam/groups/aws_iam_list_groups
+source scripts/iam/groups/aws_iam_list_users_in_group
+
+#User
+source scripts/iam/user/aws_iam_add_user_to_group
+source scripts/iam/user/aws_iam_list_users
+source scripts/iam/user/aws_iam_remove_user_from_group
+source scripts/iam/user/aws_iam_create_user
+source scripts/iam/user/aws_iam_delete_user
 
 function aws_iam_mgr(){
     while true; do
@@ -21,18 +35,7 @@ function aws_iam_mgr(){
 
         case $iam_num in
             1)
-            read -p "Enter Username for new IAM User: " iam_username
-            output=$(aws iam create-user --user-name "$iam_username" 2>&1)
-
-            if echo "$output" | grep -q "EntityAlreadyExists"; then
-                echo -e "${BOLD}${RED}Error: User '$iam_username' already exists!${RESET}"
-            elif echo "$output" | grep -q "UserName"; then
-                echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
-            else
-                echo -e "${YELLOW}Unexpected error occurred:${RESET}"
-                echo "$output"
-            fi
-            read 
+            aws_iam_create_user
             ;;
             
             2)
@@ -44,33 +47,16 @@ function aws_iam_mgr(){
             aws_iam_add_user_to_group
             ;;
             4)
-            aws_iam_list_users
-            echo""
-            read -p " Enter username you want to delete: " iam_username
-            output=$(aws iam delete-user --user-name "$iam_username" 2>&1)
-            
-            if echo "$output" | grep -q "NoSuchEntity"; then
-                echo -e "${BOLD}${RED}Error: User '$iam_username' doesn't exist!${RESET}"
-            elif [ -z "$output" ]; then
-                echo -e "${BOLD}${GREEN}User '$iam_username' deleted successfully!${RESET}"
-            else
-                echo -e "${BOLD}${YELLOW}Unexpected error occurred:${RESET}"
-                echo "$output"
-            fi
-
+            aws_iam_delete_user
             ;;
             5)
-            read -p "Enter Group Name: " iam_group
-            aws iam create-group --group-name "$iam_group" && \
-            echo -e "${GREEN}Group '$iam_group' created successfully!${RESET}"
-            sleep 1
+            aws_iam_create_group
             ;;
             6)
             aws_iam_list_groups
             ;;
             7)
-            read -p "Enter Group Name: " iam_group
-            aws iam get-group --group-name "$iam_group" --query "Users[*].[UserName]" --output table | less
+            aws_iam_list_users_in_group
             ;;
             8)
             aws_iam_delete_group
@@ -91,188 +77,9 @@ function aws_iam_mgr(){
 
 }
 
-function aws_iam_list_users()
-{
-    echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
-    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output table | 
-    sed 's/ListUsers/Users/' | 
-    awk 'NR==3{print "+------------+-------------------------+------------------------+"; 
-                print "| Username   |       User ID           |      Created At       |"; 
-                print "+------------+-------------------------+------------------------+";} 
-        NR>3 {print}'    
 
-}
 
-function aws_iam_list_groups() {
-    echo -e "${BOLD}Fetching IAM Groups...${RESET}"
-    
-    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output table | 
-    sed 's/ListGroups/Groups/' | 
-    awk 'NR==3 {
-            print "+------------+------------------+------------------------+";
-            print "| Group Name |      Group ID    |      Created At       |";
-            print "+------------+------------------+------------------------+";
-         } 
-         NR>3 { print }'
-}
 
-function aws_iam_add_user_to_group()
-{
-# Fetch IAM users and groups side by side
-echo -e "${BOLD}Fetching IAM Users & Groups...${RESET}"
 
-# Get users and groups
-users=$(aws iam list-users --query "Users[*].[UserName]" --output text)
-groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
 
-# Convert to arrays
-user_array=($users)
-group_array=($groups)
 
-# Find max count
-user_count=${#user_array[@]}
-group_count=${#group_array[@]}
-max_count=$(( user_count > group_count ? user_count : group_count ))
-
-# Print table header
-echo "+------------+------------+"
-echo "|  Users     |  Groups    |"
-echo "+------------+------------+"
-
-# Print table rows
-for ((i = 0; i < max_count; i++)); do
-    user=${user_array[i]:-"      "}  # Empty space if no more users
-    group=${group_array[i]:-"      "}  # Empty space if no more groups
-    printf "| %-10s | %-10s |\n" "$user" "$group"
-done
-
-# Print table footer
-echo "+------------+------------+"
-
-# Prompt for input
-read -p "Enter Username: " iam_username
-read -p "Enter Groupname: " iam_group
-
-# Check if user exists
-if ! echo "${users}" | grep -qw "$iam_username"; then
-    echo -e "${BOLD}${RED}Error: User '$iam_username' not found!${RESET}"
-fi
-
-# Check if group exists
-if ! echo "${groups}" | grep -qw "$iam_group"; then
-    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
-fi
-
-# Add user to group
-if aws iam add-user-to-group --user-name "$iam_username" --group-name "$iam_group"; then
-    echo -e "${BOLD}${GREEN}User '$iam_username' successfully added to group '$iam_group'!${RESET}"
-else
-    echo -e "${BOLD}${RED}Error: Failed to add user '$iam_username' to group '$iam_group'.${RESET}"
-fi
-}
-
-function aws_iam_remove_user_from_group()
-{
-
-# Fetch IAM users and groups side by side
-echo -e "${BOLD}Fetching IAM Users & Groups...${RESET}"
-
-# Get users and groups
-users=$(aws iam list-users --query "Users[*].[UserName]" --output text)
-groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
-
-# Convert to arrays
-user_array=($users)
-group_array=($groups)
-
-# Find max count
-user_count=${#user_array[@]}
-group_count=${#group_array[@]}
-max_count=$(( user_count > group_count ? user_count : group_count ))
-
-# Print table header
-echo "+------------+------------+"
-echo "|  Users     |  Groups    |"
-echo "+------------+------------+"
-
-# Print table rows
-for ((i = 0; i < max_count; i++)); do
-    user=${user_array[i]:-"      "}  # Empty space if no more users
-    group=${group_array[i]:-"      "}  # Empty space if no more groups
-    printf "| %-10s | %-10s |\n" "$user" "$group"
-done
-
-# Print table footer
-echo "+------------+------------+"
-
-# Prompt for input
-read -p "Enter Username: " iam_username
-read -p "Enter Groupname: " iam_group
-
-# Check if user exists
-if ! echo "${users}" | grep -qw "$iam_username"; then
-    echo -e "${BOLD}${RED}Error: User '$iam_username' not found!${RESET}"
-    exit 1
-fi
-
-# Check if group exists
-if ! echo "${groups}" | grep -qw "$iam_group"; then
-    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
-    exit 1
-fi
-
-# Check if the user is part of the group before removing
-group_users=$(aws iam get-group --group-name "$iam_group" --query "Users[*].[UserName]" --output text)
-
-if ! echo "${group_users}" | grep -qw "$iam_username"; then
-    echo -e "${BOLD}${RED}Error: User '$iam_username' is not a member of group '$iam_group'!${RESET}"
-    exit 1
-fi
-
-# Remove user from group
-if aws iam remove-user-from-group --group-name "$iam_group" --user-name "$iam_username"; then
-    echo -e "${BOLD}${GREEN}User '$iam_username' successfully removed from group '$iam_group'!${RESET}"
-else
-    echo -e "${BOLD}${RED}Error: Failed to remove user '$iam_username' from group '$iam_group'.${RESET}"
-fi
-}
-
-function aws_iam_delete_group()
-{
-    # Fetch IAM Groups
-echo -e "${BOLD}Fetching IAM Groups...${RESET}"
-
-# Get groups
-groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
-
-# Convert to array
-group_array=($groups)
-group_count=${#group_array[@]}
-
-# Display groups in a formatted table
-echo "+------------+"
-echo "|  Groups    |"
-echo "+------------+"
-
-for group in "${group_array[@]}"; do
-    printf "| %-10s |\n" "$group"
-done
-
-echo "+------------+"
-
-# Prompt for input
-read -p "Enter Group Name: " iam_group
-
-# Check if group exists
-if ! echo "${groups}" | grep -qw "$iam_group"; then
-    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
-    exit 1
-fi
-
-# Delete group
-if aws iam delete-group --group-name "$iam_group"; then
-    echo -e "${BOLD}${GREEN}Group '$iam_group' deleted successfully!${RESET}"
-else
-    echo -e "${BOLD}${RED}Error: Failed to delete group '$iam_group'. It may contain users or policies.${RESET}"
-fi
-}

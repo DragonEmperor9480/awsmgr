@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function aws_iam_create_user()
+{
+    read -p "Enter Username for new IAM User: " iam_username
+    output=$(aws iam create-user --user-name "$iam_username" 2>&1)
+    if echo "$output" | grep -q "EntityAlreadyExists"; then
+        echo -e "${BOLD}${RED}Error: User '$iam_username' already exists!${RESET}"
+    elif echo "$output" | grep -q "UserName"; then
+        echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
+    else
+        echo -e "${YELLOW}Unexpected error occurred:${RESET}"
+        echo "$output"
+    fi
+    read     
+}

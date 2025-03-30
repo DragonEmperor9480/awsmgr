@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function aws_iam_delete_group()
+{
+    # Fetch IAM Groups
+echo -e "${BOLD}Fetching IAM Groups...${RESET}"
+
+# Get groups
+groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
+
+# Convert to array
+group_array=($groups)
+group_count=${#group_array[@]}
+
+# Display groups in a formatted table
+echo "+------------+"
+echo "|  Groups    |"
+echo "+------------+"
+
+for group in "${group_array[@]}"; do
+    printf "| %-10s |\n" "$group"
+done
+
+echo "+------------+"
+
+# Prompt for input
+read -p "Enter Group Name: " iam_group
+
+# Check if group exists
+if ! echo "${groups}" | grep -qw "$iam_group"; then
+    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
+    exit 1
+fi
+
+# Delete group
+if aws iam delete-group --group-name "$iam_group"; then
+    echo -e "${BOLD}${GREEN}Group '$iam_group' deleted successfully!${RESET}"
+else
+    echo -e "${BOLD}${RED}Error: Failed to delete group '$iam_group'. It may contain users or policies.${RESET}"
+fi
+}

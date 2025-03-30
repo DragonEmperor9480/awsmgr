@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function aws_iam_create_group()
+{
+    read -p "Enter Group Name: " iam_group
+    output=$(aws iam create-group --group-name "$iam_group" 2>&1)  # Capture both stdout and stderr
+
+    if echo "$output" | grep -qi "already exists"; then
+        echo -e "${BOLD}${RED}Error: Group '$iam_group' already exists!${RESET}"
+    elif echo "$output" | grep -q "GroupName"; then
+        echo -e "${GREEN}Group '$iam_group' created successfully!${RESET}"
+    else
+        echo -e "${YELLOW}Unexpected error occurred:${RESET}"
+        echo "$output"
+    fi
+}

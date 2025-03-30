@@ -1,0 +1,67 @@
+#!/bin/bash
+
+function aws_iam_remove_user_from_group()
+{
+
+# Fetch IAM users and groups side by side
+echo -e "${BOLD}Fetching IAM Users & Groups...${RESET}"
+
+# Get users and groups
+users=$(aws iam list-users --query "Users[*].[UserName]" --output text)
+groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
+
+# Convert to arrays
+user_array=($users)
+group_array=($groups)
+
+# Find max count
+user_count=${#user_array[@]}
+group_count=${#group_array[@]}
+max_count=$(( user_count > group_count ? user_count : group_count ))
+
+# Print table header
+echo "+------------+------------+"
+echo "|  Users     |  Groups    |"
+echo "+------------+------------+"
+
+# Print table rows
+for ((i = 0; i < max_count; i++)); do
+    user=${user_array[i]:-"      "}  # Empty space if no more users
+    group=${group_array[i]:-"      "}  # Empty space if no more groups
+    printf "| %-10s | %-10s |\n" "$user" "$group"
+done
+
+# Print table footer
+echo "+------------+------------+"
+
+# Prompt for input
+read -p "Enter Username: " iam_username
+read -p "Enter Groupname: " iam_group
+
+# Check if user exists
+if ! echo "${users}" | grep -qw "$iam_username"; then
+    echo -e "${BOLD}${RED}Error: User '$iam_username' not found!${RESET}"
+    exit 1
+fi
+
+# Check if group exists
+if ! echo "${groups}" | grep -qw "$iam_group"; then
+    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
+    exit 1
+fi
+
+# Check if the user is part of the group before removing
+group_users=$(aws iam get-group --group-name "$iam_group" --query "Users[*].[UserName]" --output text)
+
+if ! echo "${group_users}" | grep -qw "$iam_username"; then
+    echo -e "${BOLD}${RED}Error: User '$iam_username' is not a member of group '$iam_group'!${RESET}"
+    exit 1
+fi
+
+# Remove user from group
+if aws iam remove-user-from-group --group-name "$iam_group" --user-name "$iam_username"; then
+    echo -e "${BOLD}${GREEN}User '$iam_username' successfully removed from group '$iam_group'!${RESET}"
+else
+    echo -e "${BOLD}${RED}Error: Failed to remove user '$iam_username' from group '$iam_group'.${RESET}"
+fi
+}

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+function aws_iam_list_groups() {
+    echo -e "${BOLD}Fetching IAM Groups...${RESET}"
+    
+    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output table | 
+    sed 's/ListGroups/Groups/' | 
+    awk 'NR==3 {
+            print "+------------+------------------+------------------------+";
+            print "| Group Name |      Group ID    |      Created At       |";
+            print "+------------+------------------+------------------------+";
+         } 
+         NR>3 { print }'
+}

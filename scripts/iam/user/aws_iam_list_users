@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function aws_iam_list_users()
+{
+    echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
+    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output table | 
+    sed 's/ListUsers/Users/' | 
+    awk 'NR==3{print "+------------+-------------------------+------------------------+"; 
+                print "| Username   |       User ID           |      Created At       |"; 
+                print "+------------+-------------------------+------------------------+";} 
+        NR>3 {print}'    
+
+}
