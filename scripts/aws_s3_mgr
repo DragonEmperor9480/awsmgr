@@ -4,18 +4,23 @@
 source scripts/colors
 
 source scripts/s3/aws_s3_create_bucket
+source scripts/s3/aws_s3_list_bucket
 
 function aws_s3_mgr()
 {
     while true; do
         echo -e "${GREEN}---------------------------------${RESET}"
         echo -e "${BOLD}1) Create S3 Bucket${RESET}"
+        echo -e "${BOLD}2) List S3 Bucket${RESET}"
 
         read -p "choose an option: " s3_num
 
         case $s3_num in
             1)
             aws_s3_create_bucket
+            ;;
+            2)
+            aws_s3_list_bucket
             ;;
             *)
             echo "Invalid Input"
