@@ -4,11 +4,17 @@ function aws_s3_list_bucket_objects() {
     read -p "Enter the bucket name you want to list objects from: " s3_bucket
 
     # Fetch object list
-    objects=$(aws s3 ls s3://$s3_bucket 2>&1)
-    
-    # Handle case when bucket is empty or invalid
+    objects=$(aws s3 ls s3://"$s3_bucket" 2>&1)
+
+    # Handle invalid bucket name
+    if echo "$objects" | grep -q "NoSuchBucket"; then
+        echo -e "${BOLD}${RED}Error: The specified bucket '$s3_bucket' does not exist!${RESET}"
+        return
+    fi
+
+    # Handle empty bucket
     if [[ -z "$objects" ]]; then
-        echo -e "${BOLD}${RED}No objects found or invalid bucket name!${RESET}"
+        echo -e "${BOLD}${YELLOW}No objects found in bucket '$s3_bucket'.${RESET}"
         return
     fi
 
@@ -17,13 +23,22 @@ function aws_s3_list_bucket_objects() {
     echo -e "${BOLD}│     Date Created     │          Object Name           │    Object Size (KB)    │${RESET}"
     echo -e "${BOLD}├──────────────────────┼────────────────────────────────┼────────────────────────┤${RESET}"
 
-    # Process each object and format output
-    echo "$objects" | while read -r date time size object; do
+    # Process each object and format output (fixing subshell issue)
+    while read -r date time size object; do
         if [[ -n "$object" ]]; then
-            size_kb=$((size / 1024))  # Convert bytes to KB
-            printf "${BOLD}│ %-20s │ %-30s │ %10s KB          │${RESET}\n" "$date" "$object" "$size_kb"
+            # Convert bytes to KB (rounding up)
+            size_kb=$(( (size + 1023) / 1024 ))  
+
+            # Truncate object name if too long
+            if [[ ${#object} -gt 25 ]]; then
+                truncated_object="${object:0:22}..."  # Show first 22 characters + "..."
+            else
+                truncated_object="$object"
+            fi
+
+            printf "${BOLD}│ %-20s │ %-30s │ %10s KB          │${RESET}\n" "$date" "$truncated_object" "$size_kb"
         fi
-    done
+    done < <(echo "$objects")
 
     echo -e "${BOLD}└──────────────────────┴────────────────────────────────┴────────────────────────┘${RESET}"
 }
