@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function aws_s3_create_bucket()
+{
+    read -p "Enter a unique bucket name: " s3_name
+    output=$(aws s3 mb s3://"$s3_name" 2>&1)
+    if echo "$output" | grep -q "BucketAlreadyOwnedByYou"; then
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is already owned by you!${RESET}"
+    elif echo -e "$output" | grep -q "BucketAlreadyExists"; then
+        echo -e "${BOLD}${RED} The requested bucket name is not available.${RESET}"
+    elif echo -e "$output" | grep -q "make_bucket"; then
+        echo -e "${BOLD}${GREEN}Bucket '$s3_name' created Sucessfully!${RESET}"
+    else
+        echo -e "${YELLOW}Unexpected error occurred:${RESET}"
+        echo "$output"
+    fi
+}
