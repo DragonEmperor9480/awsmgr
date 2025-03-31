@@ -4,7 +4,7 @@ function aws_s3_list_bucket_objects() {
     read -p "Enter the bucket name you want to list objects from: " s3_bucket
 
     # Fetch object list
-    objects=$(aws s3 ls s3://"$s3_bucket" 2>&1)
+    objects=$(aws s3 ls s3://"$s3_bucket" --recursive 2>&1)
 
     # Handle invalid bucket name
     if echo "$objects" | grep -q "NoSuchBucket"; then
