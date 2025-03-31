@@ -9,11 +9,24 @@ function aws_s3_delete_bucket()
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' dosen't exist!${RESET}"
     elif echo "$output" | grep -q "BucketNotEmpty"; then
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}"
-    elif echo -e "$output" | grep -q "remove_bucket"; then
-        echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted sucessfully!${RESET}"
+        echo ""
+        while true; do
+            read -p "Would you still like to proceed? (y/n): " s3_input
+            if [[ "$s3_input" == "y" ]]; then
+                aws s3 rb s3://"$s3_name" --force
+                echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
+                break
+            elif [[ "$s3_input" == "n" ]]; then
+                echo "Operation canceled."
+                break
+            else
+                echo "Invalid input. Please enter 'y' or 'n'."
+            fi
+        done
+    elif echo "$output" | grep -q "remove_bucket"; then
+        echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
     else
         echo -e "${YELLOW}Unexpected error occurred:${RESET}"
         echo "$output"
     fi
-
 }
