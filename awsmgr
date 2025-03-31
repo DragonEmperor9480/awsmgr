@@ -2,31 +2,63 @@
 source scripts/colors
 source scripts/aws_iam_mgr
 source scripts/aws_s3_mgr
+source scripts/aws_ec2_mgr
 
 clear
 
-# Print AWSMGR Header
-echo -e "${BOLD}${CYAN}==============================================${RESET}"
-echo -e "${BOLD}${BLUE}              AWSMGR - AWS CLI Manager        ${RESET}"
-echo -e "${BOLD}${CYAN}==============================================${RESET}"
-echo -e "${GREEN}🚀 Manage ALL AWS CLI functionalities in one place!${RESET}"
-echo ""
+# Print a compact, professional header
+echo -e "${BOLD}${BLUE}┌─────────────────────────────────┐${RESET}"
+echo -e "${BOLD}${BLUE}│        AWS CLI MANAGER v0.9.0   │ ${CYAN}BETA${RESET}"
+echo -e "${BOLD}${BLUE}└─────────────────────────────────┘${RESET}"
+
+# Function to display menu options in a more compact format
+show_menu() {
+    echo -e "${CYAN}Available services:${RESET}"
+    echo -e "────────────────────────────────────"
+    echo -e "${BOLD}${BLUE}[1]${RESET} ${BOLD}IAM${RESET} - Identity and Access Management"
+    echo -e "${BOLD}${BLUE}[2]${RESET} ${BOLD}EC2${RESET} - Elastic Compute Cloud"
+    echo -e "${BOLD}${BLUE}[3]${RESET} ${BOLD}S3${RESET}  - Simple Storage Service" 
+    echo -e "${BOLD}${RED}[4]${RESET} ${BOLD}Exit${RESET}"
+    echo -e "────────────────────────────────────"
+}
 
 while true; do
-    echo "
-    Which Service you want to use?
-    1) IAM
-    2) EC2
-    3) S3
-    4) Exit"
-
-    read -p "Choose: " main_num
-
+    show_menu
+    read -p "$(echo -e "${BLUE}Select option [1-4]:${RESET} ")" main_num
+    
     case $main_num in
-        1) aws_iam_mgr;;
-        2) echo "Test 2";;
-        3) aws_s3_mgr;;
-        4) echo "Exiting...";break;;
-        *) echo "Invalid Input"
+        1) 
+            echo -e "\n${CYAN}IAM MANAGEMENT${RESET}"
+            echo -e "────────────────────────────────────"
+            aws_iam_mgr
+            ;;
+        2) 
+            echo -e "\n${CYAN}EC2 MANAGEMENT${RESET}"
+            echo -e "────────────────────────────────────"
+            aws_ec2_mgr
+            ;;
+        3) 
+            echo -e "\n${CYAN}S3 MANAGEMENT${RESET}"
+            echo -e "────────────────────────────────────"
+            aws_s3_mgr
+            ;;
+        4) 
+            echo -e "\n${RED}Exiting AWS CLI Manager...${RESET}"
+            break
+            ;;
+        *) 
+            echo -e "\n${RED}Invalid selection. Please try again.${RESET}"
+            sleep 1
+            ;;
     esac
+    
+    if [ "$main_num" != "4" ]; then
+        echo ""
+        clear
+        
+        # Redraw the header
+        echo -e "${BOLD}${BLUE}┌─────────────────────────────────┐${RESET}"
+        echo -e "${BOLD}${BLUE}│        AWS CLI MANAGER v0.9.0   │ ${CYAN}BETA${RESET}"
+        echo -e "${BOLD}${BLUE}└─────────────────────────────────┘${RESET}"
+    fi
 done

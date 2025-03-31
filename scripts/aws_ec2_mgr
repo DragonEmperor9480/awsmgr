@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function aws_ec2_mgr() {
+    echo -e "${CYAN}EC2 Management Module${RESET}"
+    echo -e "────────────────────────────────────"
+    echo -e "${YELLOW}This module is still in development...${RESET}"
+    echo ""
+    
+    # Simple animation to show development in progress
+    echo -ne "${BLUE}Loading development preview${RESET}"
+    for i in {1..3}; do
+        sleep 0.5
+        echo -ne "${BLUE}.${RESET}"
+    done
+    echo ""
+    
+    # Display "under construction" message
+    echo -e "\n${YELLOW}┌───────────────────────────────┐${RESET}"
+    echo -e "${YELLOW}│     UNDER CONSTRUCTION        │${RESET}"
+    echo -e "${YELLOW}│                               │${RESET}"
+    echo -e "${YELLOW}│  EC2 Management coming soon!  │${RESET}"
+    echo -e "${YELLOW}│                               │${RESET}"
+    echo -e "${YELLOW}└───────────────────────────────┘${RESET}"
+    
+    echo -e "\n${BLUE}Features planned for this module:${RESET}"
+    echo -e "• Instance management (start/stop/reboot)"
+    echo -e "• Security group configuration"
+    echo -e "• and so on"
+
+    
+    echo -e "\n${YELLOW}Stay tuned for updates! ${RESET}"
+    
+    # Wait for user to press Enter
+    echo ""
+    read -p "$(echo -e "${BLUE}Press Enter to return to main menu...${RESET}")"
+}

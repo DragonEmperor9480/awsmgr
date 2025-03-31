@@ -17,6 +17,7 @@ function aws_s3_mgr()
         echo -e "${BOLD}2) List S3 Buckets${RESET}"
         echo -e "${BOLD}3) Delete S3 Bucket${RESET}"
         echo -e "${BOLD}4) List S3 Bucket Objects${RESET}"
+        echo -e "${BOLD}5) Exit ${RESET}"
 
 
         read -p "choose an option: " s3_num
@@ -34,6 +35,9 @@ function aws_s3_mgr()
             4)
             aws_s3_list_bucket
             aws_s3_list_bucket_objects
+            ;;
+            5)
+            break
             ;;
             *)
             echo "Invalid Input"
