@@ -10,6 +10,8 @@ function aws_s3_create_bucket()
         echo -e "${BOLD}${RED} The requested bucket name is not available.${RESET}"
     elif echo -e "$output" | grep -q "make_bucket"; then
         echo -e "${BOLD}${GREEN}Bucket '$s3_name' created Sucessfully!${RESET}"
+    elif echo -e "$output" | grep -q "BucketNotEmpty"; then
+        echo -e "${BOLD}${GREEN}Bucket '$s3_name' created Sucessfully!${RESET}"
     else
         echo -e "${YELLOW}Unexpected error occurred:${RESET}"
         echo "$output"

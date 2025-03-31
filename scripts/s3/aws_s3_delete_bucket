@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function aws_s3_delete_bucket()
+{
+    aws_s3_list_bucket
+    read -p "Enter a bucket name you want to delete: " s3_name
+    output=$(aws s3 rb s3://"$s3_name" 2>&1)
+    if echo "$output" | grep -q "AccessDenied"; then
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' dosen't exist!${RESET}"
+    elif echo "$output" | grep -q "BucketNotEmpty"; then
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}"
+    elif echo -e "$output" | grep -q "remove_bucket"; then
+        echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted sucessfully!${RESET}"
+    else
+        echo -e "${YELLOW}Unexpected error occurred:${RESET}"
+        echo "$output"
+    fi
+
+}

@@ -5,13 +5,19 @@ source scripts/colors
 
 source scripts/s3/aws_s3_create_bucket
 source scripts/s3/aws_s3_list_bucket
+source scripts/s3/aws_s3_delete_bucket
+source scripts/s3/aws_s3_list_bucket_objects
+
 
 function aws_s3_mgr()
 {
     while true; do
         echo -e "${GREEN}---------------------------------${RESET}"
         echo -e "${BOLD}1) Create S3 Bucket${RESET}"
-        echo -e "${BOLD}2) List S3 Bucket${RESET}"
+        echo -e "${BOLD}2) List S3 Buckets${RESET}"
+        echo -e "${BOLD}3) Delete S3 Bucket${RESET}"
+        echo -e "${BOLD}4) List S3 Bucket Objects${RESET}"
+
 
         read -p "choose an option: " s3_num
 
@@ -21,6 +27,13 @@ function aws_s3_mgr()
             ;;
             2)
             aws_s3_list_bucket
+            ;;
+            3)
+            aws_s3_delete_bucket
+            ;;
+            4)
+            aws_s3_list_bucket
+            aws_s3_list_bucket_objects
             ;;
             *)
             echo "Invalid Input"
