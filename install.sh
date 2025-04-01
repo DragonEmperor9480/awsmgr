@@ -17,13 +17,20 @@ spinner() {
     local delay=0.1
     local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
     local msg=$2
+    
+    # Clear the line before starting spinner
+    echo -ne "\033[2K\r"
+    
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
         printf "\r${BLUE}${BOLD}[%c]${NC} ${msg}" "$spinstr"
         local spinstr=$temp${spinstr%"$temp"}
         sleep $delay
     done
-    printf "\r${GREEN}[✓]${NC} ${msg}\n"
+    
+    # Clear the line after spinner
+    echo -ne "\033[2K\r"
+    printf "${GREEN}[✓]${NC} ${msg}\n"
 }
 
 # Function to simulate work with progress
@@ -119,7 +126,15 @@ fi
 # Remove existing installation if it exists
 echo -e "${YELLOW}Removing any existing installation...${NC}"
 if [ -d "$INSTALL_DIR" ]; then
-    (sudo rm -rf "$INSTALL_DIR" && simulate_work 1) &
+    # Clear the line and prompt for sudo password first
+    echo -e "${YELLOW}Sudo access required for installation${NC}"
+    sudo -v
+    
+    # After getting sudo access, proceed with removal
+    (
+        sudo rm -rf "$INSTALL_DIR"
+        simulate_work 1
+    ) &
     spinner $! "Removing existing installation"
 else
     echo -e "${GREEN}[✓] No previous installation found${NC}"
@@ -127,13 +142,22 @@ fi
 
 # Create the application directory
 echo -e "${YELLOW}Creating installation directory...${NC}"
-(sudo mkdir -p "$INSTALL_DIR" && simulate_work 1) &
+(
+    # Sudo access should still be cached from previous command
+    sudo mkdir -p "$INSTALL_DIR"
+    simulate_work 1
+) &
 spinner $! "Creating installation directory"
 echo -e "${GREEN}[✓] Installation directory created${NC}"
 
 # Copy all project files
 echo -e "${YELLOW}Copying files...${NC}"
-(sudo cp -r ./* "$INSTALL_DIR" && simulate_work 1.5) &
+(
+    # Copy visible and hidden files
+    sudo cp -r ./* "$INSTALL_DIR" 2>/dev/null
+    sudo cp -r ./.[!.]* "$INSTALL_DIR" 2>/dev/null
+    simulate_work 1.5
+) &
 spinner $! "Copying files to installation directory"
 echo -e "${GREEN}[✓] Files copied successfully${NC}"
 
@@ -156,8 +180,10 @@ add_to_profile() {
             echo "    local current_dir=\"\$(pwd)\"" >> "$profile"
             echo "    if pushd \"$INSTALL_DIR\" > /dev/null 2>&1; then" >> "$profile"
             echo "        if [ -f \"./awsmgr\" ]; then" >> "$profile"
+            echo "            trap 'popd > /dev/null 2>&1; return 1' INT" >> "$profile"
             echo "            bash \"./awsmgr\" \"\$@\"" >> "$profile"
             echo "            local exit_status=\$?" >> "$profile"
+            echo "            trap - INT" >> "$profile"
             echo "            popd > /dev/null 2>&1" >> "$profile"
             echo "            return \$exit_status" >> "$profile"
             echo "        else" >> "$profile"
@@ -194,10 +220,17 @@ add_to_fish_config() {
             echo "set -gx AWSSCRIPT \"$EXECUTABLE\"" >> "$FISH_CONFIG_FILE"
             echo "" >> "$FISH_CONFIG_FILE"
             echo "function awsmgr" >> "$FISH_CONFIG_FILE"
-            echo "    set -l current_dir (pwd)" >> "$FISH_CONFIG_FILE"  # Store current directory
+            echo "    set -l current_dir (pwd)" >> "$FISH_CONFIG_FILE"
+            echo "    function --on-signal INT _cleanup" >> "$FISH_CONFIG_FILE"
+            echo "        cd \$current_dir" >> "$FISH_CONFIG_FILE"
+            echo "        return 1" >> "$FISH_CONFIG_FILE"
+            echo "    end" >> "$FISH_CONFIG_FILE"
             echo "    cd \"$INSTALL_DIR\"; or return 1" >> "$FISH_CONFIG_FILE"
             echo "    bash \"./awsmgr\" \$argv" >> "$FISH_CONFIG_FILE"
-            echo "    cd \$current_dir; or return 1" >> "$FISH_CONFIG_FILE"  # Return to original directory
+            echo "    set -l exit_status \$status" >> "$FISH_CONFIG_FILE"
+            echo "    functions -e _cleanup" >> "$FISH_CONFIG_FILE"
+            echo "    cd \$current_dir; or return 1" >> "$FISH_CONFIG_FILE"
+            echo "    return \$exit_status" >> "$FISH_CONFIG_FILE"
             echo "end" >> "$FISH_CONFIG_FILE"
             echo -e "${GREEN}[✓] Added to fish config${NC}"
             return 0
