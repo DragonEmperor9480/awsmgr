@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source scripts/iam/aws_iam_list_users
-
 function aws_iam_delete_user()
 {
     aws_iam_list_users
