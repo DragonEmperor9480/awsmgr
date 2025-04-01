@@ -1,0 +1,32 @@
+{
+  "screenshots": [
+    {
+      "id": 1,
+      "title": "Main Menu",
+      "description": "AWS CLI Manager main interface showing available services",
+      "image": "assets/main_menu.png",
+      "category": "interface"
+    },
+    {
+      "id": 2,
+      "title": "IAM Users List",
+      "description": "View and manage all IAM users in your AWS account",
+      "image": "assets/list_iam_users.png",
+      "category": "iam"
+    },
+    {
+      "id": 3,
+      "title": "IAM Groups List",
+      "description": "Manage IAM groups and their associated permissions",
+      "image": "assets/list_iam_groups.png",
+      "category": "iam"
+    },
+    {
+      "id": 4,
+      "title": "S3 Menu",
+      "description": "S3 bucket management options for creating, listing and managing storage",
+      "image": "assets/s3_menu.png",
+      "category": "s3"
+    }
+  ]
+} 

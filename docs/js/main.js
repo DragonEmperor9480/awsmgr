@@ -339,4 +339,250 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFeatures();
     loadNotices();
     loadTodos();
+
+    // Add this near your other page load functions
+
+    async function loadScreenshots() {
+        const screenshotsGrid = document.getElementById('screenshots-grid');
+        if (!screenshotsGrid) return;
+
+        try {
+            console.log('Attempting to fetch assets.json...');
+            const response = await fetch('data/assets.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            console.log('Screenshot data received, parsing JSON...');
+            const data = await response.json();
+            
+            // Remove loading spinner
+            screenshotsGrid.innerHTML = '';
+            
+            // Render screenshots
+            renderScreenshots(data.screenshots);
+            
+            // Set up full screen preview (keep this functionality)
+            setupFullscreenPreview();
+        } catch (error) {
+            console.warn('Error loading screenshots:', error);
+            
+            // Create fallback screenshots
+            const fallbackScreenshots = [
+                {
+                    id: 1,
+                    title: "Main Menu",
+                    description: "AWS CLI Manager main interface showing available services",
+                    image: "assets/main_menu.png",
+                    category: "interface"
+                },
+                {
+                    id: 2,
+                    title: "IAM Users List",
+                    description: "View and manage all IAM users in your AWS account",
+                    image: "assets/list_iam_users.png",
+                    category: "iam"
+                },
+                {
+                    id: 3,
+                    title: "IAM Groups List",
+                    description: "Manage IAM groups and their associated permissions",
+                    image: "assets/list_iam_groups.png",
+                    category: "iam"
+                },
+                {
+                    id: 4,
+                    title: "S3 Menu",
+                    description: "S3 bucket management options for creating, listing and managing storage",
+                    image: "assets/s3_menu.png",
+                    category: "s3"
+                }
+            ];
+            
+            screenshotsGrid.innerHTML = ''; // Clear error
+            renderScreenshots(fallbackScreenshots);
+            setupFullscreenPreview();
+            
+            console.log('Using fallback screenshot data');
+        }
+    }
+
+    function renderScreenshots(screenshots) {
+        const screenshotsGrid = document.getElementById('screenshots-grid');
+        screenshotsGrid.innerHTML = '';
+        
+        // Sort images to show main menu first, then by category
+        const sortedScreenshots = [...screenshots].sort((a, b) => {
+            // Main menu should always come first
+            if (a.title.includes("Main Menu")) return -1;
+            if (b.title.includes("Main Menu")) return 1;
+            
+            // Then sort by category
+            if (a.category < b.category) return -1;
+            if (a.category > b.category) return 1;
+            return 0;
+        });
+        
+        // Start loading main menu immediately (preload)
+        if (sortedScreenshots.length > 0) {
+            const mainMenuImg = new Image();
+            mainMenuImg.src = sortedScreenshots[0].image;
+        }
+        
+        sortedScreenshots.forEach((screenshot, index) => {
+            const card = document.createElement('div');
+            card.className = `screenshot-card category-${screenshot.category}`;
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            // Create image container
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'screenshot-img-container';
+            
+            // Create image with improved loading
+            const img = document.createElement('img');
+            img.alt = screenshot.title;
+            img.loading = index === 0 ? 'eager' : 'lazy';
+            img.style.opacity = '0';
+            img.style.transition = 'opacity 0.3s ease';
+            img.src = screenshot.image;
+            
+            // Show image when loaded
+            img.onload = function() {
+                img.style.opacity = '1';
+            };
+            
+            // Add the category badge and zoom overlay
+            const badge = document.createElement('span');
+            badge.className = 'category-badge';
+            badge.textContent = screenshot.category;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'zoom-overlay';
+            overlay.innerHTML = '<i class="fas fa-search-plus"></i>';
+            
+            // Add click handler to show preview
+            imgContainer.addEventListener('click', () => {
+                showFullscreenPreview(screenshot);
+            });
+            
+            // Assemble the image container
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(badge);
+            imgContainer.appendChild(overlay);
+            
+            // Create the content section
+            const content = document.createElement('div');
+            content.className = 'screenshot-content';
+            content.innerHTML = `
+                <h3 class="screenshot-title">${screenshot.title}</h3>
+                <p class="screenshot-description">${screenshot.description}</p>
+            `;
+            
+            // Assemble the card
+            card.appendChild(imgContainer);
+            card.appendChild(content);
+            screenshotsGrid.appendChild(card);
+        });
+        
+        // Add click-to-zoom hint
+        const hintElement = document.createElement('div');
+        hintElement.className = 'zoom-hint';
+        hintElement.innerHTML = '<i class="fas fa-search-plus"></i> Click any screenshot to enlarge';
+        screenshotsGrid.parentNode.insertBefore(hintElement, screenshotsGrid.nextSibling);
+    }
+
+    // Create a dedicated function for showing the fullscreen preview
+    function showFullscreenPreview(screenshot) {
+        // Get or create fullscreen preview container
+        let preview = document.querySelector('.fullscreen-preview');
+        
+        if (!preview) {
+            preview = document.createElement('div');
+            preview.className = 'fullscreen-preview';
+            preview.innerHTML = `
+                <button class="close-preview"><i class="fas fa-times"></i></button>
+                <img class="fullscreen-image" src="" alt="">
+                <div class="image-caption"></div>
+            `;
+            document.body.appendChild(preview);
+            
+            // Close on button click
+            preview.querySelector('.close-preview').addEventListener('click', () => {
+                preview.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            });
+            
+            // Close on background click
+            preview.addEventListener('click', (e) => {
+                if (e.target === preview) {
+                    preview.classList.remove('active');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+            });
+            
+            // Close on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && preview.classList.contains('active')) {
+                    preview.classList.remove('active');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+            });
+        }
+        
+        // Show loading indicator
+        preview.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling while preview is open
+        
+        const previewImage = preview.querySelector('.fullscreen-image');
+        const imageCaption = preview.querySelector('.image-caption');
+        
+        // Clear previous image and set caption
+        previewImage.style.opacity = '0';
+        previewImage.src = '';
+        imageCaption.innerHTML = `<strong>${screenshot.title}</strong><br>${screenshot.description}`;
+        
+        // Load the image
+        const img = new Image();
+        img.onload = function() {
+            // Once image is loaded, show it
+            previewImage.src = screenshot.image;
+            setTimeout(() => {
+                previewImage.style.opacity = '1';
+            }, 50);
+        };
+        img.src = screenshot.image;
+    }
+
+    // Update the setupFullscreenPreview function
+    function setupFullscreenPreview() {
+        // Add click event to all screenshot images
+        const screenshotCards = document.querySelectorAll('.screenshot-card');
+        
+        screenshotCards.forEach(card => {
+            const img = card.querySelector('img');
+            const title = card.querySelector('.screenshot-title').textContent;
+            const description = card.querySelector('.screenshot-description').textContent;
+            const image = img.src;
+            
+            // Create screenshot object
+            const screenshot = {
+                title: title,
+                description: description,
+                image: image,
+                category: card.className.includes('interface') ? 'interface' : 
+                        card.className.includes('iam') ? 'iam' : 
+                        card.className.includes('s3') ? 's3' : 'other'
+            };
+            
+            // Add click event to the image container
+            card.querySelector('.screenshot-img-container').addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering card click
+                showFullscreenPreview(screenshot);
+            });
+        });
+    }
+
+    // Add this to your existing page load functions
+    loadScreenshots();
 }); 
