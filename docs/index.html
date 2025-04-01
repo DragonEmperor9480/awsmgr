@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWSMGR - AWS CLI Management Tool</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#0a1929" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-terminal"></i>
+                <span>AWSMGR</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#installation">Installation</a>
+                <a href="#documentation">Documentation</a>
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-slider"></span>
+                </label>
+                <a href="https://github.com/DragonEmperor9480/awsmgr" class="github-btn">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+            <button class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>AWSMGR <span class="version">v0.9.0</span><span class="beta-badge">Beta</span></h1>
+            <p class="subtitle">Streamline your AWS CLI operations with an intuitive terminal interface</p>
+            <div class="cta-buttons">
+                <a href="#installation" class="btn btn-primary">Get Started</a>
+                <a href="#documentation" class="btn btn-secondary">View Docs</a>
+            </div>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="terminal-title">awsmgr</div>
+                </div>
+                <div class="terminal-body">
+                    <pre><code class="typing">$ awsmgr
+
+┌─────────────────────────────────┐
+│        AWS CLI MANAGER v0.9.0   │ BETA
+└─────────────────────────────────┘
+
+Available services:
+────────────────────────────────────
+[1] IAM - Identity and Access Management
+[2] EC2 - Elastic Compute Cloud
+[3] S3  - Simple Storage Service
+[4] Exit
+────────────────────────────────────</code></pre>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div id="feature-grid" class="feature-grid">
+                <!-- Features will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="installation" class="installation">
+        <div class="container">
+            <h2>Installation</h2>
+            <div class="install-steps">
+                <div class="step">
+                    <h3>1. Clone Repository</h3>
+                    <div class="code-block">
+                        <pre><code>git clone https://github.com/DragonEmperor9480/awsmgr.git</code></pre>
+                        <button class="copy-btn" data-clipboard-target="#clone-command">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="step">
+                    <h3>2. Run Install Script</h3>
+                    <div class="code-block">
+                        <pre><code>cd awsmgr
+chmod +x install.sh
+./install.sh</code></pre>
+                    </div>
+                </div>
+                <div class="step">
+                    <h3>3. Start Using AWSMGR</h3>
+                    <div class="code-block">
+                        <pre><code>awsmgr</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="documentation" class="documentation">
+        <div class="container">
+            <h2>Documentation</h2>
+            <div class="doc-grid">
+                <div class="doc-card">
+                    <h3>IAM Commands</h3>
+                    <ul>
+                        <li>Create/Delete Users</li>
+                        <li>Manage Groups</li>
+                        <li>List Users/Groups</li>
+                        <li>User-Group Operations</li>
+                    </ul>
+                </div>
+                <div class="doc-card">
+                    <h3>S3 Commands</h3>
+                    <ul>
+                        <li>Create Buckets</li>
+                        <li>List Buckets</li>
+                        <li>Delete Buckets</li>
+                        <li>List Objects</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-terminal"></i>
+                    <span>AWSMGR</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/DragonEmperor9480/awsmgr">GitHub</a>
+                    <a href="#documentation">Documentation</a>
+                    <a href="#features">Features</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AWSMGR. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html> 
