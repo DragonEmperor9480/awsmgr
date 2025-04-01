@@ -11,13 +11,41 @@ BLUE='\033[0;34m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-# Print banner
-echo -e "${BLUE}${BOLD}"
-echo "┌───────────────────────────────────┐"
-echo "│         AWS CLI MANAGER           │"
-echo "│           INSTALLATION            │"
-echo "└───────────────────────────────────┘"
-echo -e "${NC}"
+# Spinner function
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local msg=$2
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf "\r${BLUE}${BOLD}[%c]${NC} ${msg}" "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+    done
+    printf "\r${GREEN}[✓]${NC} ${msg}\n"
+}
+
+# Function to simulate work with progress
+simulate_work() {
+    local duration=$1
+    sleep $duration
+}
+
+# Print banner with animation
+print_banner() {
+    clear
+    echo -e "${BLUE}${BOLD}"
+    echo "┌───────────────────────────────────┐"
+    sleep 0.1
+    echo "│         AWS CLI MANAGER           │"
+    sleep 0.1
+    echo "│           INSTALLATION            │"
+    sleep 0.1
+    echo "└───────────────────────────────────┘"
+    echo -e "${NC}"
+    sleep 0.5
+}
 
 # Define installation paths
 INSTALL_DIR="/usr/local/bin/awsmgr"
@@ -31,8 +59,12 @@ FISH_CONFIG_FILE="$FISH_CONFIG_DIR/config.fish"
 CURRENT_SHELL=$(basename "$SHELL")
 echo -e "${YELLOW}Detected shell: ${BOLD}$CURRENT_SHELL${NC}"
 
+print_banner
+
 # Check if AWS CLI is installed
 echo -e "${YELLOW}Checking prerequisites...${NC}"
+(simulate_work 1) &
+spinner $! "Checking for AWS CLI installation"
 if ! command -v aws &> /dev/null; then
     echo -e "${RED}[ERROR] AWS CLI is not installed or not in PATH${NC}"
     echo -e "${YELLOW}Please install AWS CLI before installing AWSMGR:${NC}"
@@ -51,34 +83,67 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+# Function to remove existing awsmgr configuration
+remove_existing_config() {
+    local profile="$1"
+    if [ -f "$profile" ]; then
+        # Remove existing awsmgr function and export
+        sed -i '/# AWS CLI Manager/d' "$profile"
+        sed -i '/export AWSSCRIPT=/d' "$profile"
+        sed -i '/^awsmgr() {/,/^}/d' "$profile"
+        echo -e "${GREEN}[✓] Removed existing configuration from $profile${NC}"
+    fi
+}
+
+# Remove existing configurations before adding new ones
+echo -e "${YELLOW}Checking for existing configurations...${NC}"
+
+# Remove from bash profile
+if [ -f "$RC_FILE" ]; then
+    remove_existing_config "$RC_FILE"
+fi
+
+# Remove from zsh profile
+if [ -f "$ZSH_RC_FILE" ]; then
+    remove_existing_config "$ZSH_RC_FILE"
+fi
+
+# Remove from fish config
+if [ -f "$FISH_CONFIG_FILE" ]; then
+    sed -i '/# AWS CLI Manager/d' "$FISH_CONFIG_FILE"
+    sed -i '/set -gx AWSSCRIPT/d' "$FISH_CONFIG_FILE"
+    sed -i '/^function awsmgr/,/^end/d' "$FISH_CONFIG_FILE"
+    echo -e "${GREEN}[✓] Removed existing configuration from fish config${NC}"
+fi
+
 # Remove existing installation if it exists
 echo -e "${YELLOW}Removing any existing installation...${NC}"
 if [ -d "$INSTALL_DIR" ]; then
-    sudo rm -rf "$INSTALL_DIR" || { echo -e "${RED}[ERROR] Failed to remove existing installation${NC}"; exit 1; }
-    echo -e "${GREEN}[✓] Previous installation removed${NC}"
+    (sudo rm -rf "$INSTALL_DIR" && simulate_work 1) &
+    spinner $! "Removing existing installation"
 else
     echo -e "${GREEN}[✓] No previous installation found${NC}"
 fi
 
 # Create the application directory
 echo -e "${YELLOW}Creating installation directory...${NC}"
-sudo mkdir -p "$INSTALL_DIR" || { echo -e "${RED}[ERROR] Failed to create installation directory${NC}"; exit 1; }
+(sudo mkdir -p "$INSTALL_DIR" && simulate_work 1) &
+spinner $! "Creating installation directory"
 echo -e "${GREEN}[✓] Installation directory created${NC}"
 
 # Copy all project files
 echo -e "${YELLOW}Copying files...${NC}"
-sudo cp -r ./* "$INSTALL_DIR" || { echo -e "${RED}[ERROR] Failed to copy project files${NC}"; exit 1; }
+(sudo cp -r ./* "$INSTALL_DIR" && simulate_work 1.5) &
+spinner $! "Copying files to installation directory"
 echo -e "${GREEN}[✓] Files copied successfully${NC}"
 
 # Ensure the main directory files are executable
 echo -e "${YELLOW}Setting permissions...${NC}"
-sudo chmod -R +x "$INSTALL_DIR" || { echo -e "${RED}[ERROR] Failed to set permissions${NC}"; exit 1; }
+(sudo chmod -R +x "$INSTALL_DIR" && simulate_work 1) &
+spinner $! "Setting executable permissions"
 echo -e "${GREEN}[✓] Permissions set${NC}"
 
-# Add to shell configuration
-echo -e "${YELLOW}Updating shell configuration...${NC}"
-
-# Function to add to bash/zsh profile
+# Function to add to shell profile
 add_to_profile() {
     local profile="$1"
     if [ -f "$profile" ]; then
@@ -88,8 +153,22 @@ add_to_profile() {
             echo "export AWSSCRIPT=\"$EXECUTABLE\"" >> "$profile"
             echo "" >> "$profile"
             echo "awsmgr() {" >> "$profile"
-            echo "    cd \"$INSTALL_DIR\" || return 1" >> "$profile"
-            echo "    bash \"./awsmgr\" \"\$@\"" >> "$profile"
+            echo "    local current_dir=\"\$(pwd)\"" >> "$profile"
+            echo "    if pushd \"$INSTALL_DIR\" > /dev/null 2>&1; then" >> "$profile"
+            echo "        if [ -f \"./awsmgr\" ]; then" >> "$profile"
+            echo "            bash \"./awsmgr\" \"\$@\"" >> "$profile"
+            echo "            local exit_status=\$?" >> "$profile"
+            echo "            popd > /dev/null 2>&1" >> "$profile"
+            echo "            return \$exit_status" >> "$profile"
+            echo "        else" >> "$profile"
+            echo "            popd > /dev/null 2>&1" >> "$profile"
+            echo "            echo \"Error: AWSMGR script not found\"" >> "$profile"
+            echo "            return 1" >> "$profile"
+            echo "        fi" >> "$profile"
+            echo "    else" >> "$profile"
+            echo "        echo \"Error: Could not access AWSMGR directory\"" >> "$profile"
+            echo "        return 1" >> "$profile"
+            echo "    fi" >> "$profile"
             echo "}" >> "$profile"
             echo -e "${GREEN}[✓] Added to $profile${NC}"
             return 0
@@ -115,8 +194,10 @@ add_to_fish_config() {
             echo "set -gx AWSSCRIPT \"$EXECUTABLE\"" >> "$FISH_CONFIG_FILE"
             echo "" >> "$FISH_CONFIG_FILE"
             echo "function awsmgr" >> "$FISH_CONFIG_FILE"
+            echo "    set -l current_dir (pwd)" >> "$FISH_CONFIG_FILE"  # Store current directory
             echo "    cd \"$INSTALL_DIR\"; or return 1" >> "$FISH_CONFIG_FILE"
             echo "    bash \"./awsmgr\" \$argv" >> "$FISH_CONFIG_FILE"
+            echo "    cd \$current_dir; or return 1" >> "$FISH_CONFIG_FILE"  # Return to original directory
             echo "end" >> "$FISH_CONFIG_FILE"
             echo -e "${GREEN}[✓] Added to fish config${NC}"
             return 0
@@ -183,8 +264,10 @@ if [ "$shell_updated" != "true" ]; then
     echo "export AWSSCRIPT=\"$EXECUTABLE\""
     echo ""
     echo "awsmgr() {"
+    echo "    local current_dir=\$(pwd)"
     echo "    cd \"$INSTALL_DIR\" || return 1"
     echo "    bash \"./awsmgr\" \"\$@\""
+    echo "    cd \"\$current_dir\" || return 1"
     echo "}"
     echo ""
     echo -e "${BOLD}For Fish:${NC}"
@@ -221,3 +304,6 @@ echo ""
 echo -e "${BLUE}Note:${NC} AWSMGR requires AWS CLI to be installed and configured."
 echo -e "If you haven't configured AWS CLI yet, run: ${BOLD}aws configure${NC}"
 echo -e "${YELLOW}────────────────────────────────────────────────${NC}"
+
+# Add a small delay before exiting
+sleep 1
