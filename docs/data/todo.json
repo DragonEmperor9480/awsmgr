@@ -1,0 +1,24 @@
+{
+    "todos": [
+        {
+            "task": "Improve design",
+            "status": "in-progress",
+            "priority": "high"
+        },
+        {
+            "task": "Add EC2 support",
+            "status": "planned",
+            "priority": "high"
+        },
+        {
+            "task": "Add user policy support",
+            "status": "planned",
+            "priority": "medium"
+        },
+        {
+            "task": "Add IAM user password management",
+            "status": "planned",
+            "priority": "medium"
+        }
+    ]
+}

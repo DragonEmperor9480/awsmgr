@@ -49,7 +49,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelector('.nav-links');
     
     mobileMenu.addEventListener('click', () => {
-        navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        navLinks.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.mobile-menu') && !e.target.closest('.nav-links')) {
+            navLinks.classList.remove('active');
+        }
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+        });
     });
 
     // Copy to clipboard functionality
@@ -165,6 +179,164 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Function to load and render notices
+    async function loadNotices() {
+        const noticeContainer = document.getElementById('notice-container');
+        if (!noticeContainer) return;
+
+        try {
+            const response = await fetch('data/noticeboard.json');
+            const data = await response.json();
+            renderNotices(data.notices);
+        } catch (error) {
+            console.warn('Error loading notices:', error);
+            noticeContainer.innerHTML = `
+                <div class="notice-card notice-type-info">
+                    <div class="notice-header">
+                        <div class="notice-title">
+                            <i class="fas fa-info-circle"></i>
+                            Beta Status
+                        </div>
+                        <div class="notice-date">2024-03</div>
+                    </div>
+                    <div class="notice-message">
+                        As this project is in beta stage, continuous fixes are being made and some bugs might be present.
+                        Please report any issues on GitHub.
+                    </div>
+                </div>
+                <div class="notice-card notice-type-update">
+                    <div class="notice-header">
+                        <div class="notice-title">
+                            <i class="fas fa-bell"></i>
+                            Platform Support
+                        </div>
+                        <div class="notice-date">2024-03</div>
+                    </div>
+                    <div class="notice-message">
+                        Currently available for Linux. Windows support coming soon!
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function renderNotices(notices) {
+        const noticeContainer = document.getElementById('notice-container');
+        noticeContainer.innerHTML = '';
+
+        notices.forEach((notice, index) => {
+            const noticeCard = document.createElement('div');
+            noticeCard.className = `notice-card notice-type-${notice.type}`;
+            noticeCard.style.animationDelay = `${index * 0.1}s`;
+
+            // Get the icon based on notice type
+            const iconClass = notice.type === 'info' ? 'info-circle' : 
+                              notice.type === 'update' ? 'bell' : 
+                              notice.type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+
+            noticeCard.innerHTML = `
+                <div class="notice-header">
+                    <div class="notice-title">
+                        <i class="fas fa-${iconClass}"></i>
+                        ${notice.title}
+                    </div>
+                    <div class="notice-date">${notice.date}</div>
+                </div>
+                <div class="notice-message">${notice.message}</div>
+            `;
+
+            noticeContainer.appendChild(noticeCard);
+        });
+    }
+
+    // Add this function after loadNotices()
+    async function loadTodos() {
+        const todoContainer = document.getElementById('todo-container');
+        if (!todoContainer) return;
+
+        try {
+            // Add logging to see if the fetch is being attempted
+            console.log('Attempting to fetch todo.json...');
+            const response = await fetch('data/todo.json');
+            
+            // Check if the response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            console.log('Todo data received, parsing JSON...');
+            const data = await response.json();
+            console.log('Todo data parsed:', data);
+            renderTodos(data.todos);
+        } catch (error) {
+            console.warn('Error loading todos:', error);
+            
+            // Display a more helpful error message
+            todoContainer.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Failed to load roadmap items</p>
+                    <small>Error details: ${error.message}</small>
+                </div>
+            `;
+            
+            // Fallback to hardcoded todos if fetch fails
+            const fallbackTodos = [
+                {
+                    task: "Improve design",
+                    status: "in-progress",
+                    priority: "high"
+                },
+                {
+                    task: "Add EC2 support",
+                    status: "planned",
+                    priority: "high"
+                },
+                {
+                    task: "Add user policy support",
+                    status: "planned",
+                    priority: "medium"
+                },
+                {
+                    task: "Add IAM user password management",
+                    status: "planned",
+                    priority: "medium"
+                }
+            ];
+            
+            // After a short delay, render the fallback todos
+            setTimeout(() => {
+                console.log('Using fallback todo data');
+                renderTodos(fallbackTodos);
+            }, 1000);
+        }
+    }
+
+    function renderTodos(todos) {
+        const todoContainer = document.getElementById('todo-container');
+        todoContainer.innerHTML = '';
+
+        todos.forEach((todo, index) => {
+            const todoItem = document.createElement('div');
+            todoItem.className = `todo-item priority-${todo.priority}`;
+            todoItem.style.animationDelay = `${index * 0.1}s`;
+
+            todoItem.innerHTML = `
+                <div class="todo-task">
+                    <i class="fas fa-${todo.status === 'in-progress' ? 'spinner fa-spin' : 'tasks'}"></i>
+                    ${todo.task}
+                </div>
+                <span class="todo-status status-${todo.status}">
+                    ${todo.status.replace('-', ' ')}
+                </span>
+            `;
+
+            todoContainer.appendChild(todoItem);
+        });
+    }
+
     // Load features
     loadFeatures();
+    loadNotices();
+    loadTodos();
 }); 

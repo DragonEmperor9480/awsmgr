@@ -53,29 +53,58 @@
                     <div class="terminal-title">awsmgr</div>
                 </div>
                 <div class="terminal-body">
-                    <pre><code class="typing">$ awsmgr
+                    <pre><code class="typing" style="color: #e2e8f0;">$ awsmgr
 
-┌─────────────────────────────────┐
-│        AWS CLI MANAGER v0.9.0   │ BETA
-└─────────────────────────────────┘
+┌───────────────────┐
+│  AWS CLI MANAGER  │ BETA
+└───────────────────┘
 
 Available services:
-────────────────────────────────────
-[1] IAM - Identity and Access Management
-[2] EC2 - Elastic Compute Cloud
-[3] S3  - Simple Storage Service
+──────────────────
+[1] IAM
+[2] EC2
+[3] S3
 [4] Exit
-────────────────────────────────────</code></pre>
+──────────────────</code></pre>
                 </div>
             </div>
         </div>
     </header>
+
+    <section id="noticeboard" class="noticeboard">
+        <div class="container">
+            <h2>Noticeboard</h2>
+            <div id="notice-container" class="notice-container">
+                <!-- Notices will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
 
     <section id="features" class="features">
         <div class="container">
             <h2>Features</h2>
             <div id="feature-grid" class="feature-grid">
                 <!-- Features will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="platforms" class="platforms">
+        <div class="container">
+            <h2>Available Platforms</h2>
+            <div class="platform-grid">
+                <div class="platform-card available">
+                    <i class="fab fa-linux"></i>
+                    <h3>Linux</h3>
+                    <span class="status-badge">Available</span>
+                    <p>Fully supported on major Linux distributions</p>
+                </div>
+                <div class="platform-card coming-soon">
+                    <i class="fab fa-windows"></i>
+                    <h3>Windows</h3>
+                    <span class="status-badge">Coming Soon</span>
+                    <p>Windows support is under development</p>
+                </div>
             </div>
         </div>
     </section>
@@ -137,6 +166,21 @@ chmod +x install.sh
         </div>
     </section>
 
+    <section id="roadmap" class="roadmap">
+        <div class="container">
+            <h2>Development Roadmap</h2>
+            <div id="todo-container" class="todo-container">
+                <!-- Todos will be dynamically loaded here -->
+            </div>
+            <div class="github-cta">
+                <p>Found a bug or have a suggestion? Please raise an issue on GitHub!</p>
+                <a href="https://github.com/DragonEmperor9480/awsmgr/issues" class="btn btn-primary">
+                    <i class="fab fa-github"></i> Report Issue
+                </a>
+            </div>
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -145,13 +189,14 @@ chmod +x install.sh
                     <span>AWSMGR</span>
                 </div>
                 <div class="footer-links">
-                    <a href="https://github.com/DragonEmperor9480/awsmgr">GitHub</a>
-                    <a href="#documentation">Documentation</a>
                     <a href="#features">Features</a>
+                    <a href="#installation">Installation</a>
+                    <a href="#documentation">Documentation</a>
+                    <a href="https://github.com/DragonEmperor9480/awsmgr/issues">Report Issues</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 AWSMGR. MIT License.</p>
+                <p>&copy; 2024 Amrutesh Naregal. All rights reserved.</p>
             </div>
         </div>
     </footer>
