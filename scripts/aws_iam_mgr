@@ -40,7 +40,6 @@ function aws_iam_mgr(){
             
             2)
             aws_iam_list_users
-            read
             ;;
 
             3)

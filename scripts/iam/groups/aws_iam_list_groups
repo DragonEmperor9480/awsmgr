@@ -1,14 +1,18 @@
 #!/bin/bash
 
 function aws_iam_list_groups() {
-    echo -e "${BOLD}Fetching IAM Groups...${RESET}"
+    echo -e "${RED}${BOLD}Fetching IAM Groups...${RESET}"
     
-    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output table | 
-    sed 's/ListGroups/Groups/' | 
-    awk 'NR==3 {
-            print "+------------+------------------+------------------------+";
-            print "| Group Name |      Group ID    |      Created At       |";
-            print "+------------+------------------+------------------------+";
-         } 
-         NR>3 { print }'
+    # Print Table Header with Borders
+    echo -e "${BOLD}┌────────────────────┬───────────────────────┬──────────────────────────┐${RESET}"
+    echo -e "${BOLD}│    Group Name      │       Group ID        │       Created At         │${RESET}"
+    echo -e "${BOLD}├────────────────────┼───────────────────────┼──────────────────────────┤${RESET}"
+    
+    # Fetch and format IAM groups list
+    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output text | while read -r name id created_at; do
+        printf "${BOLD}│ %-18s │ %-20s │ %-24s │${RESET}\n" "$name" "$id" "$created_at"
+    done
+
+    # Print Bottom Border
+    echo -e "${BOLD}└────────────────────┴───────────────────────┴──────────────────────────┘${RESET}"
 }

@@ -3,11 +3,17 @@
 function aws_iam_list_users()
 {
     echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
-    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output table | 
-    sed 's/ListUsers/Users/' | 
-    awk 'NR==3{print "+------------+-------------------------+------------------------+"; 
-                print "| Username   |       User ID           |      Created At       |"; 
-                print "+------------+-------------------------+------------------------+";} 
-        NR>3 {print}'    
+    
+    # Print Table Header with Borders
+    echo -e "${BOLD}┌────────────────┬────────────────────────────────┬──────────────────────────┐${RESET}"
+    echo -e "${BOLD}│   Username     │             User ID            │      Created At          │${RESET}"
+    echo -e "${BOLD}├────────────────┼────────────────────────────────┼──────────────────────────┤${RESET}"
+    
+    # Fetch IAM users and format output
+    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output text | while read -r username userid created_at; do
+        printf "${BOLD}│ %-14s │ %-30s │ %-24s │${RESET}\n" "$username" "$userid" "$created_at"
+    done
 
+    # Print Bottom Border
+    echo -e "${BOLD}└────────────────┴────────────────────────────────┴──────────────────────────┘${RESET}"
 }
