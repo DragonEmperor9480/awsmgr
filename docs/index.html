@@ -143,24 +143,42 @@ chmod +x install.sh
     <section id="documentation" class="documentation">
         <div class="container">
             <h2>Documentation</h2>
-            <div class="doc-grid">
-                <div class="doc-card">
-                    <h3>IAM Commands</h3>
-                    <ul>
-                        <li>Create/Delete Users</li>
-                        <li>Manage Groups</li>
-                        <li>List Users/Groups</li>
-                        <li>User-Group Operations</li>
-                    </ul>
+            
+            <!-- Add this note box -->
+            <div class="note-box">
+                <div class="note-icon">
+                    <i class="fas fa-info-circle"></i>
                 </div>
-                <div class="doc-card">
-                    <h3>S3 Commands</h3>
-                    <ul>
-                        <li>Create Buckets</li>
-                        <li>List Buckets</li>
-                        <li>Delete Buckets</li>
-                        <li>List Objects</li>
-                    </ul>
+                <div class="note-content">
+                    <h3>Important Prerequisite</h3>
+                    <p>AWSMGR operates as a wrapper around the official AWS CLI tool provided by Amazon. Please ensure that the AWS CLI is installed and properly configured on your system before using AWSMGR.</p>
+                    <p>If you haven't installed AWS CLI yet, please install it and run the following command to configure it with the necessary permissions:</p>
+                    <div class="code-inline">aws configure</div>
+                    <p>This will prompt you to enter your AWS access key, secret key, default region, and output format. Make sure your AWS credentials have the appropriate permissions for the services you intend to manage.</p>
+                </div>
+            </div>
+            
+            <!-- Rest of documentation content -->
+            <div class="documentation-content">
+                <div class="doc-grid">
+                    <div class="doc-card">
+                        <h3>IAM Commands</h3>
+                        <ul>
+                            <li>Create/Delete Users</li>
+                            <li>Manage Groups</li>
+                            <li>List Users/Groups</li>
+                            <li>User-Group Operations</li>
+                        </ul>
+                    </div>
+                    <div class="doc-card">
+                        <h3>S3 Commands</h3>
+                        <ul>
+                            <li>Create Buckets</li>
+                            <li>List Buckets</li>
+                            <li>Delete Buckets</li>
+                            <li>List Objects</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

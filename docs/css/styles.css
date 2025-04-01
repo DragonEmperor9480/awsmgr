@@ -103,6 +103,7 @@ body {
     color: var(--primary-color);
 }
 
+/* Update GitHub button styles for better visibility in dark mode */
 .github-btn {
     background-color: var(--secondary-color);
     color: white !important;
@@ -111,10 +112,24 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .github-btn:hover {
-    background-color: #1a202c;
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Add specific dark mode styling for GitHub button */
+[data-theme="dark"] .github-btn {
+    background-color: #2d3748;
+    color: white !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .github-btn:hover {
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 180, 255, 0.3);
 }
 
 /* Hero Section */
@@ -424,6 +439,62 @@ body {
     margin-left: -1em;
 }
 
+/* Documentation Note Box */
+.note-box {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 2rem auto 3rem;
+    display: flex;
+    gap: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    border-left: 4px solid #3498db;
+}
+
+.note-icon {
+    flex-shrink: 0;
+}
+
+.note-icon i {
+    font-size: 2rem;
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.note-content h3 {
+    color: var(--secondary-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.note-content p {
+    color: var(--text-color);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.note-content p:last-child {
+    margin-bottom: 0;
+}
+
+.code-inline {
+    background: var(--terminal-bg);
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 0.5rem 0;
+}
+
 /* Footer */
 .footer {
     background-color: var(--footer-bg);
@@ -659,6 +730,16 @@ input:checked + .theme-slider:before {
     .footer-links {
         flex-direction: column;
         gap: 1rem;
+    }
+
+    .note-box {
+        flex-direction: column;
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+    
+    .note-icon {
+        align-self: flex-start;
     }
 }
 
