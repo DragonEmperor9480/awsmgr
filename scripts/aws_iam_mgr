@@ -15,6 +15,8 @@ source scripts/iam/user/aws_iam_list_users
 source scripts/iam/user/aws_iam_remove_user_from_group
 source scripts/iam/user/aws_iam_create_user
 source scripts/iam/user/aws_iam_delete_user
+source scripts/iam/user/aws_iam_user_group_count
+
 
 function aws_iam_mgr(){
     while true; do
@@ -26,9 +28,10 @@ function aws_iam_mgr(){
         echo -e "${BOLD}5) Create Groups${RESET}"
         echo -e "${BOLD}6) List Groups${RESET}"
         echo -e "${BOLD}7) Check Total Users in Group${RESET}"
-        echo -e "${BOLD}8) Delete Group${RESET}"
-        echo -e "${BOLD}9) Remove User from a Group${RESET}"
-        echo -e "${BOLD}10) Back to Main Menu${RESET}"
+        echo -e "${BOLD}8) List how many groups a user is in${RESET}"
+        echo -e "${BOLD}9) Delete Group${RESET}"
+        echo -e "${BOLD}10) Remove User from a Group${RESET}"
+        echo -e "${BOLD}11) Back to Main Menu${RESET}"
         echo -e "${GREEN}---------------------------------${RESET}"
             
         read -p "Choose an option: " iam_num
@@ -58,12 +61,16 @@ function aws_iam_mgr(){
             aws_iam_list_users_in_group
             ;;
             8)
-            aws_iam_delete_group
+            aws_iam_list_users
+            aws_iam_user_group_count
             ;;
             9)
-            aws_iam_remove_user_from_group
+            aws_iam_delete_group
             ;;
             10)
+            aws_iam_remove_user_from_group
+            ;;
+            11)
             echo "Going back to Main Menu"
             break;;
             *)

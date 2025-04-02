@@ -41,13 +41,13 @@ read -p "Enter Groupname: " iam_group
 # Check if user exists
 if ! echo "${users}" | grep -qw "$iam_username"; then
     echo -e "${BOLD}${RED}Error: User '$iam_username' not found!${RESET}"
-    exit 1
+    return
 fi
 
 # Check if group exists
 if ! echo "${groups}" | grep -qw "$iam_group"; then
     echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
-    exit 1
+    return
 fi
 
 # Check if the user is part of the group before removing
@@ -55,7 +55,7 @@ group_users=$(aws iam get-group --group-name "$iam_group" --query "Users[*].[Use
 
 if ! echo "${group_users}" | grep -qw "$iam_username"; then
     echo -e "${BOLD}${RED}Error: User '$iam_username' is not a member of group '$iam_group'!${RESET}"
-    exit 1
+    return
 fi
 
 # Remove user from group

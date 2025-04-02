@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function aws_iam_user_group_count() {
+    read -p "Enter IAM Username: " username
+
+    # Check if the user exists
+    user_exists=$(aws iam get-user --user-name "$username" --query "User.UserName" --output text 2>/dev/null)
+
+    if [ -z "$user_exists" ]; then
+        echo -e "${BOLD}${RED}Error: User '$username' does not exist!${RESET}"
+        return
+    fi
+
+    echo -e "${RED}${BOLD}Fetching Groups for User: $username...${RESET}"
+
+    # Fetch groups
+    groups_data=$(aws iam list-groups-for-user --user-name "$username" --query "Groups[*].[GroupName, CreateDate]" --output text)
+
+    if [ -z "$groups_data" ]; then
+        echo -e "${BOLD}${YELLOW}No groups found for user: $username${RESET}"
+        return
+    fi
+
+    # Print Table Header with Borders (Increased Width)
+    echo -e "${BOLD}┌──────────────────────────┬───────────────────────────────────────────┐${RESET}"
+    echo -e "${BOLD}│       Group Name         │           Created At                     │${RESET}"
+    echo -e "${BOLD}├──────────────────────────┼───────────────────────────────────────────┤${RESET}"
+
+    # Format and display groups
+    echo "$groups_data" | while read -r group created_at; do
+        # Truncate long group names (Limit: 25 characters)
+        if [[ ${#group} -gt 25 ]]; then
+            group="${group:0:22}..."  # Keep first 22 characters and add "..."
+        fi
+        printf "${BOLD}│ %-24s │ %-35s │${RESET}\n" "$group" "$created_at"
+    done
+
+    # Print Bottom Border
+    echo -e "${BOLD}└──────────────────────────┴───────────────────────────────────────────┘${RESET}"
+}
