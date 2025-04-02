@@ -3,16 +3,88 @@
 function aws_iam_delete_user()
 {
     aws_iam_list_users
-    echo""
-    read -p " Enter username you want to delete: " iam_username
-    output=$(aws iam delete-user --user-name "$iam_username" 2>&1)  
-    if echo "$output" | grep -q "NoSuchEntity"; then
+    echo ""
+
+    # Prompt user for username
+    read -p "Enter username you want to delete: " iam_username
+
+    # Check if user exists
+    user_exists=$(aws iam get-user --user-name "$iam_username" 2>&1)
+    if echo "$user_exists" | grep -q "NoSuchEntity"; then
         echo -e "${BOLD}${RED}Error: User '$iam_username' doesn't exist!${RESET}"
-    elif [ -z "$output" ]; then
+        return 1
+    fi
+
+    # Check if user is in any IAM groups
+    user_groups=$(aws iam list-groups-for-user --user-name "$iam_username" --query "Groups[*].GroupName" --output text)
+
+    # Check if user has any attached policies
+    user_policies=$(aws iam list-attached-user-policies --user-name "$iam_username" --query "AttachedPolicies[*].PolicyName" --output text)
+
+    # Check if user has an IAM login profile (password set)
+    has_password=$(aws iam get-login-profile --user-name "$iam_username" 2>&1)
+    if echo "$has_password" | grep -q "NoSuchEntity"; then
+        has_password="No"
+    else
+        has_password="Yes"
+    fi
+
+    # If the user is not in any group, remove them directly
+    if [ -z "$user_groups" ] && [ -z "$user_policies" ] && [ "$has_password" == "No" ]; then
+        output=$(aws iam delete-user --user-name "$iam_username" 2>&1)
+        if [ -z "$output" ]; then
+            echo -e "${BOLD}${GREEN}User '$iam_username' deleted successfully!${RESET}"
+        else
+            echo -e "${BOLD}${YELLOW}Unexpected error occurred:${RESET}"
+            echo "$output"
+        fi
+        return 0
+    fi
+
+    # Display dependencies if the user has them
+    echo -e "\n${BOLD}User '$iam_username' has the following dependencies:${RESET}"
+    if [ -n "$user_groups" ]; then
+        echo -e "${YELLOW}- Groups: $user_groups${RESET}"
+    fi
+    if [ -n "$user_policies" ]; then
+        echo -e "${YELLOW}- Policies: $user_policies${RESET}"
+    fi
+    if [ "$has_password" == "Yes" ]; then
+        echo -e "${YELLOW}- IAM Login Profile (Password set)${RESET}"
+    fi
+
+    # Ask for confirmation
+    read -p "User has dependencies. Do you still want to delete them? (y/n): " confirm
+    if [[ "$confirm" != "y" ]]; then
+        echo -e "${BOLD}${RED}User deletion aborted.${RESET}"
+        return 1
+    fi
+
+    # Remove user from groups
+    if [ -n "$user_groups" ]; then
+        for group in $user_groups; do
+            aws iam remove-user-from-group --group-name "$group" --user-name "$iam_username"
+        done
+    fi
+
+    # Detach user policies
+    if [ -n "$user_policies" ]; then
+        for policy in $user_policies; do
+            aws iam detach-user-policy --user-name "$iam_username" --policy-arn "arn:aws:iam::aws:policy/$policy"
+        done
+    fi
+
+    # Delete IAM login profile (password)
+    if [ "$has_password" == "Yes" ]; then
+        aws iam delete-login-profile --user-name "$iam_username"
+    fi
+
+    # Finally, delete the user
+    output=$(aws iam delete-user --user-name "$iam_username" 2>&1)  
+    if [ -z "$output" ]; then
         echo -e "${BOLD}${GREEN}User '$iam_username' deleted successfully!${RESET}"
     else
         echo -e "${BOLD}${YELLOW}Unexpected error occurred:${RESET}"
         echo "$output"
     fi
-
 }
