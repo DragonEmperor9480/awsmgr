@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function show_processing_animation() {
+    local message="$1"  # Custom message to display
+    echo -n "$message"
+    
+    local delay=0.1
+    local spin_chars=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+    
+    while :; do
+        for char in "${spin_chars[@]}"; do
+            echo -ne "\r${BOLD}${CYAN}$message $char${RESET}"
+            sleep "$delay"
+        done
+    done
+}

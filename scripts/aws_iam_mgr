@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Animation
+source scripts/utils/show_processing_animation
+
+#Back menu
+source scripts/utils/bk
+
 #colors
 source scripts/colors
 
@@ -20,55 +26,80 @@ source scripts/iam/user/aws_iam_user_group_count
 
 function aws_iam_mgr(){
     while true; do
-        echo -e "${GREEN}---------------------------------${RESET}"
-        echo -e "${BOLD}1) Create IAM User${RESET}"
-        echo -e "${BOLD}2) List Users${RESET}"
-        echo -e "${BOLD}3) Add User to a Group${RESET}"
-        echo -e "${BOLD}4) Delete User${RESET}"
-        echo -e "${BOLD}5) Create Groups${RESET}"
-        echo -e "${BOLD}6) List Groups${RESET}"
-        echo -e "${BOLD}7) Check Total Users in Group${RESET}"
-        echo -e "${BOLD}8) List how many groups a user is in${RESET}"
-        echo -e "${BOLD}9) Delete Group${RESET}"
-        echo -e "${BOLD}10) Remove User from a Group${RESET}"
-        echo -e "${BOLD}11) Back to Main Menu${RESET}"
-        echo -e "${GREEN}---------------------------------${RESET}"
-            
+
+        echo -e "${GREEN}=============================================${RESET}"
+        echo -e "${BOLD}${CYAN}          AWS IAM MANAGEMENT MENU            ${RESET}"
+        echo -e "${GREEN}=============================================${RESET}"
+
+        echo -e "${BOLD}${YELLOW} 🔹 User Management${RESET}"
+        echo -e "   ${BOLD}1)${RESET} ➜ Create IAM User"
+        echo -e "   ${BOLD}2)${RESET} ➜ List IAM Users"
+        echo -e "   ${BOLD}3)${RESET} ➜ Add User to a Group"
+        echo -e "   ${BOLD}4)${RESET} ➜ Delete IAM User"
+
+        echo -e "${GREEN}---------------------------------------------${RESET}"
+
+        echo -e "${BOLD}${MAGENTA} 🔹 Group Management${RESET}"
+        echo -e "   ${BOLD}5)${RESET} ➜ Create IAM Group"
+        echo -e "   ${BOLD}6)${RESET} ➜ List IAM Groups"
+        echo -e "   ${BOLD}7)${RESET} ➜ Check Total Users in a Group"
+        echo -e "   ${BOLD}8)${RESET} ➜ List Groups a User Belongs To"
+        echo -e "   ${BOLD}9)${RESET} ➜ Delete IAM Group"
+        echo -e "   ${BOLD}10)${RESET} ➜ Remove User from a Group"
+
+        echo -e "${GREEN}---------------------------------------------${RESET}"
+
+        echo -e "${BOLD}${RED} 🔹 Other Options${RESET}"
+        echo -e "   ${BOLD}11)${RESET} ➜ Back to Main Menu"
+
+        echo -e "${GREEN}=============================================${RESET}"
+
+
         read -p "Choose an option: " iam_num
 
         case $iam_num in
             1)
             aws_iam_create_user
+            bk
             ;;
             
             2)
             aws_iam_list_users
+            bk
             ;;
 
             3)
             aws_iam_add_user_to_group
+            bk
             ;;
             4)
             aws_iam_delete_user
+            bk
             ;;
             5)
             aws_iam_create_group
+            bk
             ;;
             6)
             aws_iam_list_groups
+            bk
             ;;
             7)
             aws_iam_list_users_in_group
+            bk
             ;;
             8)
             aws_iam_list_users
             aws_iam_user_group_count
+            bk
             ;;
             9)
             aws_iam_delete_group
+            bk
             ;;
             10)
             aws_iam_remove_user_from_group
+            bk
             ;;
             11)
             echo "Going back to Main Menu"
