@@ -2,18 +2,27 @@
 
 function aws_iam_list_users()
 {
-    echo -e "${RED}${BOLD}Fetching IAM Users...${RESET}"
+
+    # Start animation in the background and capture its PID
+    show_processing_animation "Loading IAM Users" &
+    animation_pid=$!
+
+    # Fetch IAM users
+    user_data=$(aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output text)
+
+    # Stop the animation
+    kill "$animation_pid" &>/dev/null
+    wait "$animation_pid" 2>/dev/null
     
-    # Print Table Header with Borders
-    echo -e "${BOLD}┌────────────────┬────────────────────────────────┬──────────────────────────┐${RESET}"
+    echo -e "\n${BOLD}┌────────────────┬────────────────────────────────┬──────────────────────────┐${RESET}"
     echo -e "${BOLD}│   Username     │             User ID            │      Created At          │${RESET}"
     echo -e "${BOLD}├────────────────┼────────────────────────────────┼──────────────────────────┤${RESET}"
-    
-    # Fetch IAM users and format output
-    aws iam list-users --query "Users[*].[UserName, UserId, CreateDate]" --output text | while read -r username userid created_at; do
+
+    # Format and print user list
+    echo "$user_data" | while read -r username userid created_at; do
         printf "${BOLD}│ %-14s │ %-30s │ %-24s │${RESET}\n" "$username" "$userid" "$created_at"
     done
 
-    # Print Bottom Border
     echo -e "${BOLD}└────────────────┴────────────────────────────────┴──────────────────────────┘${RESET}"
+
 }

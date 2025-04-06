@@ -1,15 +1,25 @@
 #!/bin/bash
 
 function aws_iam_list_groups() {
-    echo -e "${RED}${BOLD}Fetching IAM Groups...${RESET}"
-    
-    # Print Table Header with Borders
-    echo -e "${BOLD}┌────────────────────┬───────────────────────┬──────────────────────────┐${RESET}"
+
+    # Start animation in the background and capture its PID
+    show_processing_animation "Loading IAM Groups" &
+    animation_pid=$!
+
+    # Fetch IAM groups
+    group_data=$(aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output text)
+
+    # Stop the animation
+    kill "$animation_pid" &>/dev/null
+    wait "$animation_pid" 2>/dev/null
+        # Print Table Header with Borders
+
+    echo -e "\n${BOLD}┌────────────────────┬───────────────────────┬──────────────────────────┐${RESET}"
     echo -e "${BOLD}│    Group Name      │       Group ID        │       Created At         │${RESET}"
     echo -e "${BOLD}├────────────────────┼───────────────────────┼──────────────────────────┤${RESET}"
-    
-    # Fetch and format IAM groups list
-    aws iam list-groups --query "Groups[*].[GroupName, GroupId, CreateDate]" --output text | while read -r name id created_at; do
+
+    # Format and print the group list
+    echo "$group_data" | while read -r name id created_at; do
         printf "${BOLD}│ %-18s │ %-20s │ %-24s │${RESET}\n" "$name" "$id" "$created_at"
     done
 
