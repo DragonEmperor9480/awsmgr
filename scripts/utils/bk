@@ -2,4 +2,6 @@
 function bk() {
     read -n 1 -s -r -p "Press any key to go back..."
     echo ""  # Move to a new line after key press
+    clear
+    sleep 0.25
 }
