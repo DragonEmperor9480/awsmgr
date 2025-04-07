@@ -3,6 +3,11 @@
 function aws_iam_user_group_count() {
     read -p "Enter IAM Username: " username
 
+    if [[ -z "$username" ]]; then
+        echo -e "${BOLD}${RED}Please enter a valid name${RESET}"
+        return
+    fi
+
     # Check if the user exists
     user_exists=$(aws iam get-user --user-name "$username" --query "User.UserName" --output text 2>/dev/null)
 
