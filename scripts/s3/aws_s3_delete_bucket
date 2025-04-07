@@ -1,8 +1,15 @@
 #!/bin/bash
 
-function aws_s3_delete_bucket()
-{
+function aws_s3_delete_bucket() {
+    # Get list of buckets using your existing function
     aws_s3_list_bucket
+    buckets_output=$(aws_s3_list_bucket)
+
+    # If no buckets found, return
+    if [[ -z "$buckets_output" || "$buckets_output" == *"No S3 buckets found"* ]]; then
+        return
+    fi
+
     read -p "Enter a bucket name you want to delete: " s3_name
 
     # Try deleting the bucket normally
@@ -12,8 +19,8 @@ function aws_s3_delete_bucket()
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' doesn't exist or you don't have access!${RESET}"
 
     elif echo "$output" | grep -q "BucketNotEmpty"; then
-        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}"
-        echo ""
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}\n"
+
         while true; do
             read -p "Would you still like to delete everything inside it including versions? (y/n): " s3_input
             if [[ "$s3_input" == "y" ]]; then
@@ -34,7 +41,7 @@ function aws_s3_delete_bucket()
                 # Try deleting bucket again
                 output=$(aws s3 rb s3://"$s3_name" 2>&1)
                 if echo "$output" | grep -q "remove_bucket"; then
-                    echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
+                    echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully after cleaning!${RESET}"
                 else
                     echo -e "${BOLD}${RED}Error: Couldn't delete the bucket after cleaning.${RESET}"
                     echo "$output"
