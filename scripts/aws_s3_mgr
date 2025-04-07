@@ -33,7 +33,6 @@ function aws_s3_mgr()
             aws_s3_delete_bucket
             ;;
             4)
-            aws_s3_list_bucket
             aws_s3_list_bucket_objects
             ;;
             5)

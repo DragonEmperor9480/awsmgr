@@ -1,6 +1,13 @@
-#!/bin/bash
-
 function aws_s3_list_bucket_objects() {
+    aws_s3_list_bucket
+    output=$(aws_s3_list_bucket)
+
+    # Check if no buckets are listed
+    if echo "$output" | grep -q "No S3 buckets found" || [[ -z "$output" ]]; then
+        echo -e "${BOLD}${RED}Since there are no S3 buckets, no objects to list now!${RESET}"
+        return
+    fi
+
     read -p "Enter the bucket name you want to list objects from: " s3_bucket
 
     # Fetch object list
@@ -23,15 +30,13 @@ function aws_s3_list_bucket_objects() {
     echo -e "${BOLD}│     Date Created     │          Object Name           │    Object Size (KB)    │${RESET}"
     echo -e "${BOLD}├──────────────────────┼────────────────────────────────┼────────────────────────┤${RESET}"
 
-    # Process each object and format output (fixing subshell issue)
+    # Process each object and format output
     while read -r date time size object; do
         if [[ -n "$object" ]]; then
-            # Convert bytes to KB (rounding up)
-            size_kb=$(( (size + 1023) / 1024 ))  
+            size_kb=$(( (size + 1023) / 1024 ))  # Convert bytes to KB (rounded up)
 
-            # Truncate object name if too long
             if [[ ${#object} -gt 25 ]]; then
-                truncated_object="${object:0:22}..."  # Show first 22 characters + "..."
+                truncated_object="${object:0:22}..."
             else
                 truncated_object="$object"
             fi
