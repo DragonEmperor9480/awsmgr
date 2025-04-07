@@ -1,41 +1,97 @@
-#!/bin/bash
-
 function aws_iam_delete_group()
 {
-    # Fetch IAM Groups
-echo -e "${BOLD}Fetching IAM Groups...${RESET}"
+    aws_iam_list_groups
+    echo ""
 
-# Get groups
-groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
+    # Prompt for input
+    read -p "Enter Group Name: " iam_group
 
-# Convert to array
-group_array=($groups)
-group_count=${#group_array[@]}
+    # Check if input is empty
+    if [[ -z "$iam_group" ]]; then
+        echo -e "${BOLD}${RED}Please enter a valid group name.${RESET}"
+        return 1
+    fi
 
-# Display groups in a formatted table
-echo "+------------+"
-echo "|  Groups    |"
-echo "+------------+"
+    # Start animation for group existence check
+    show_processing_animation "Checking group existence..." &
+    animation_pid=$!
+    if ! aws iam get-group --group-name "$iam_group" >/dev/null 2>&1; then
+        kill "$animation_pid" >/dev/null 2>&1
+        wait "$animation_pid" 2>/dev/null
+        echo -e "${BOLD}${RED}Error: Group '$iam_group' does not exist.${RESET}"
+        return 1
+    fi
+    kill "$animation_pid" >/dev/null 2>&1
+    wait "$animation_pid" 2>/dev/null
 
-for group in "${group_array[@]}"; do
-    printf "| %-10s |\n" "$group"
-done
+    echo -e "\n${BOLD}Checking dependencies for group '$iam_group'...${RESET}"
 
-echo "+------------+"
+    show_processing_animation "Fetching group dependencies..." &
+    animation_pid=$!
+    echo ""
 
-# Prompt for input
-read -p "Enter Group Name: " iam_group
+    # Fetch policies and users
+    attached_policies=$(aws iam list-attached-group-policies --group-name "$iam_group" --query "AttachedPolicies[*].PolicyName" --output text)
+    group_users=$(aws iam get-group --group-name "$iam_group" --query "Users[*].UserName" --output text)
 
-# Check if group exists
-if ! echo "${groups}" | grep -qw "$iam_group"; then
-    echo -e "${BOLD}${RED}Error: Group '$iam_group' not found!${RESET}"
-    return
-fi
+    kill "$animation_pid" >/dev/null 2>&1
+    wait "$animation_pid" 2>/dev/null
 
-# Delete group
-if aws iam delete-group --group-name "$iam_group"; then
-    echo -e "${BOLD}${GREEN}Group '$iam_group' deleted successfully!${RESET}"
-else
-    echo -e "${BOLD}${RED}Error: Failed to delete group '$iam_group'. It may contain users or policies.${RESET}"
-fi
+    # Show dependencies if any
+    if [[ -n "$attached_policies" || -n "$group_users" ]]; then
+        echo ""
+        echo -e "${YELLOW}Group '$iam_group' has the following dependencies:${RESET}"
+        [[ -n "$attached_policies" ]] && echo -e "${YELLOW}- Policies: $attached_policies${RESET}"
+        [[ -n "$group_users" ]] && echo -e "${YELLOW}- Users: $group_users${RESET}"
+        echo ""
+        
+        read -p "Do you want to detach policies & remove users before deleting the group? (y/n): " confirm
+        if [[ "$confirm" != "y" ]]; then
+            echo -e "${BOLD}${RED}Group deletion aborted.${RESET}"
+            return 1
+        fi
+    fi
+
+    echo -e "\n${BOLD}Cleaning up group dependencies...${RESET}"
+
+    # Detach all policies
+    if [ -n "$attached_policies" ]; then
+        show_processing_animation "Detaching policies..." &
+        animation_pid=$!
+        for policy_name in $attached_policies; do
+            policy_arn="arn:aws:iam::aws:policy/$policy_name"
+            aws iam detach-group-policy --group-name "$iam_group" --policy-arn "$policy_arn"
+        done
+        kill "$animation_pid" >/dev/null 2>&1
+        wait "$animation_pid" 2>/dev/null
+        echo -e "${YELLOW}Detached all managed policies from '$iam_group'.${RESET}"
+    fi
+
+    # Remove all users
+    if [ -n "$group_users" ]; then
+        show_processing_animation "Removing users from group..." &
+        animation_pid=$!
+        for user in $group_users; do
+            aws iam remove-user-from-group --group-name "$iam_group" --user-name "$user"
+        done
+        kill "$animation_pid" >/dev/null 2>&1
+        wait "$animation_pid" 2>/dev/null
+        echo -e "${YELLOW}Removed all users from '$iam_group'.${RESET}"
+    fi
+
+    # Delete group
+    show_processing_animation "Deleting group '$iam_group'..." &
+    animation_pid=$!
+    echo ""
+    if aws iam delete-group --group-name "$iam_group" >/dev/null 2>&1; then
+        kill "$animation_pid" >/dev/null 2>&1
+        wait "$animation_pid" 2>/dev/null
+        echo ""
+        echo -e "${BOLD}${GREEN}Group '$iam_group' deleted successfully!${RESET}"
+    else
+        kill "$animation_pid" >/dev/null 2>&1
+        wait "$animation_pid" 2>/dev/null
+        echo ""
+        echo -e "${BOLD}${RED}Error: Failed to delete group '$iam_group'.${RESET}"
+    fi
 }
