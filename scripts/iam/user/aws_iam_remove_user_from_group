@@ -2,12 +2,18 @@
 
 function aws_iam_remove_user_from_group()
 {
-    # Fetch IAM users and groups
-    echo -e "${BOLD}Fetching IAM Users & Groups...${RESET}"
+    # Start animation while fetching data
+    show_processing_animation "Fetching IAM Users & Groups..." &
+    animation_pid=$!
 
     # Get users and groups
     users=$(aws iam list-users --query "Users[*].[UserName]" --output text)
     groups=$(aws iam list-groups --query "Groups[*].[GroupName]" --output text)
+
+    kill "$animation_pid"
+    wait "$animation_pid" 2>/dev/null
+
+    echo -e "\n${BOLD}IAM Users and Groups:${RESET}"
 
     # Convert to arrays
     user_array=($users)
@@ -18,20 +24,19 @@ function aws_iam_remove_user_from_group()
     group_count=${#group_array[@]}
     max_count=$(( user_count > group_count ? user_count : group_count ))
 
-    # Print table header
-    echo "+----------------------+----------------------+"
-    echo "|       Users         |       Groups         |"
-    echo "+----------------------+----------------------+"
+    # Print table header with Unicode
+    echo -e "${BOLD}┌────────────────────────────┬────────────────────────────┐${RESET}"
+    echo -e "${BOLD}│          Users             │           Groups           │${RESET}"
+    echo -e "${BOLD}├────────────────────────────┼────────────────────────────┤${RESET}"
 
     # Print table rows
     for ((i = 0; i < max_count; i++)); do
-        user=${user_array[i]:-"      "}  
-        group=${group_array[i]:-"      "}  
-        printf "| %-20s | %-20s |\n" "$user" "$group"
+        user=${user_array[i]:-""}
+        group=${group_array[i]:-""}
+        printf "${BOLD}│ %-26s │ %-26s │${RESET}\n" "$user" "$group"
     done
 
-    # Print table footer
-    echo "+----------------------+----------------------+"
+    echo -e "${BOLD}└────────────────────────────┴────────────────────────────┘${RESET}"
 
     # Prompt for username input
     read -p "Enter Username: " iam_username
@@ -42,31 +47,43 @@ function aws_iam_remove_user_from_group()
         return
     fi
 
-    # Fetch the groups the user is in
+    # Start animation for fetching user groups
+    show_processing_animation "Fetching groups for user '$iam_username'..." &
+    animation_pid=$!
+
     user_groups=$(aws iam list-groups-for-user --user-name "$iam_username" --query "Groups[*].GroupName" --output text)
 
+    kill "$animation_pid"
+    wait "$animation_pid" 2>/dev/null
+    echo ""
     if [ -z "$user_groups" ]; then
         echo -e "${BOLD}${RED}Error: User '$iam_username' is not in any groups!${RESET}"
         return
     fi
 
     echo -e "\n${BOLD}User '$iam_username' is in the following groups:${RESET}"
-    echo "$user_groups" | awk '{print NR") "$0}' # Numbered list
+    echo "$user_groups" | awk '{print NR") "$0}'
 
     # Prompt for group selection
     read -p "Enter the group number to remove the user from: " group_number
 
-    # Validate input
     iam_group=$(echo "$user_groups" | awk "NR==$group_number")
     if [ -z "$iam_group" ]; then
         echo -e "${BOLD}${RED}Error: Invalid selection!${RESET}"
         return
     fi
 
-    # Remove user from selected group
-    if aws iam remove-user-from-group --group-name "$iam_group" --user-name "$iam_username"; then
+    # Show animation while removing
+    show_processing_animation "Removing user from group '$iam_group'..." &
+    animation_pid=$!
+
+    if aws iam remove-user-from-group --group-name "$iam_group" --user-name "$iam_username" >/dev/null 2>&1; then
+        kill "$animation_pid"
+        wait "$animation_pid" 2>/dev/null
         echo -e "${BOLD}${GREEN}User '$iam_username' successfully removed from group '$iam_group'!${RESET}"
     else
+        kill "$animation_pid"
+        wait "$animation_pid" 2>/dev/null
         echo -e "${BOLD}${RED}Error: Failed to remove user '$iam_username' from group '$iam_group'.${RESET}"
     fi
 }
