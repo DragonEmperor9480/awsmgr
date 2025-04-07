@@ -3,18 +3,26 @@
 function aws_s3_list_bucket()
 {
     echo -e "${RED}${BOLD}Fetching S3 Buckets...${RESET}"
-    
+
+    # Fetch bucket list
+    bucket_list=$(aws s3 ls)
+
+    # Check if it's empty
+    if [[ -z "$bucket_list" ]]; then
+        echo -e "${YELLOW}${BOLD}No S3 buckets found in your account.${RESET}"
+        return
+    fi
+
     # Print Table Header with Borders
     echo -e "${BOLD}┌──────────────────────┬──────────────────────────────┐${RESET}"
     echo -e "${BOLD}│      Date Created    │         Bucket Name          │${RESET}"
     echo -e "${BOLD}├──────────────────────┼──────────────────────────────┤${RESET}"
-    
-    # Fetch and format bucket list
-    aws s3 ls | while read -r date time bucket; do
+
+    # Format and print each bucket
+    echo "$bucket_list" | while read -r date time bucket; do
         printf "${BOLD}│ %-20s │ %-28s │${RESET}\n" "$date" "$bucket"
     done
 
     # Print Bottom Border
     echo -e "${BOLD}└──────────────────────┴──────────────────────────────┘${RESET}"
 }
-
