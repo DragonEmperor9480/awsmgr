@@ -3,14 +3,30 @@
 function aws_iam_create_user()
 {
     read -p "Enter Username for new IAM User: " iam_username
+
+    if [[ -z "$iam_username" ]]; then
+        echo -e "${BOLD}${RED}Please enter a valid name${RESET}"
+        return
+    fi
+    #Start Processing animation in background
+    show_processing_animation "Creating IAM User" &
+    animation_pid=$!
+
+    # Run the AWS command
     output=$(aws iam create-user --user-name "$iam_username" 2>&1)
+
+   # Stop the animation
+    kill "$animation_pid" >/dev/null 2>&1
+    wait "$animation_pid" 2>/dev/null
+
+    echo ""
+        
     if echo "$output" | grep -q "EntityAlreadyExists"; then
         echo -e "${BOLD}${RED}Error: User '$iam_username' already exists!${RESET}"
     elif echo "$output" | grep -q "UserName"; then
-        echo -e "${GREEN}User '$iam_username' created successfully!${RESET}"
+        echo -e "${BOLD}${GREEN}User '$iam_username' created successfully!${RESET}"
     else
         echo -e "${YELLOW}Unexpected error occurred:${RESET}"
         echo "$output"
     fi
-    read     
 }
