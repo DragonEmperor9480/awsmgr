@@ -4,18 +4,43 @@ function aws_s3_delete_bucket()
 {
     aws_s3_list_bucket
     read -p "Enter a bucket name you want to delete: " s3_name
+
+    # Try deleting the bucket normally
     output=$(aws s3 rb s3://"$s3_name" 2>&1)
+
     if echo "$output" | grep -q "AccessDenied"; then
-        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' dosen't exist!${RESET}"
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' doesn't exist or you don't have access!${RESET}"
+
     elif echo "$output" | grep -q "BucketNotEmpty"; then
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}"
         echo ""
         while true; do
-            read -p "Would you still like to proceed? (y/n): " s3_input
+            read -p "Would you still like to delete everything inside it including versions? (y/n): " s3_input
             if [[ "$s3_input" == "y" ]]; then
-                aws s3 rb s3://"$s3_name" --force
-                echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
+                echo -e "${YELLOW}Deleting all objects and versions in the bucket...${RESET}"
+
+                # Delete all versions
+                aws s3api list-object-versions --bucket "$s3_name" --query 'Versions[*].[Key,VersionId]' --output text | \
+                while read -r key version_id; do
+                    aws s3api delete-object --bucket "$s3_name" --key "$key" --version-id "$version_id" >/dev/null
+                done
+
+                # Delete all delete markers
+                aws s3api list-object-versions --bucket "$s3_name" --query 'DeleteMarkers[*].[Key,VersionId]' --output text | \
+                while read -r key version_id; do
+                    aws s3api delete-object --bucket "$s3_name" --key "$key" --version-id "$version_id" >/dev/null
+                done
+
+                # Try deleting bucket again
+                output=$(aws s3 rb s3://"$s3_name" 2>&1)
+                if echo "$output" | grep -q "remove_bucket"; then
+                    echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
+                else
+                    echo -e "${BOLD}${RED}Error: Couldn't delete the bucket after cleaning.${RESET}"
+                    echo "$output"
+                fi
                 break
+
             elif [[ "$s3_input" == "n" ]]; then
                 echo "Operation canceled."
                 break
@@ -23,8 +48,10 @@ function aws_s3_delete_bucket()
                 echo "Invalid input. Please enter 'y' or 'n'."
             fi
         done
+
     elif echo "$output" | grep -q "remove_bucket"; then
         echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully!${RESET}"
+
     else
         echo -e "${YELLOW}Unexpected error occurred:${RESET}"
         echo "$output"
