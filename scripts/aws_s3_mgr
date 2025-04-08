@@ -25,15 +25,19 @@ function aws_s3_mgr()
         case $s3_num in
             1)
             aws_s3_create_bucket
+            bk
             ;;
             2)
             aws_s3_list_bucket
+            bk
             ;;
             3)
             aws_s3_delete_bucket
+            bk
             ;;
             4)
             aws_s3_list_bucket_objects
+            bk
             ;;
             5)
             break
