@@ -2,11 +2,18 @@
 
 function aws_s3_list_bucket()
 {
-    echo -e "${RED}${BOLD}Fetching S3 Buckets...${RESET}"
 
+    show_processing_animation "Fetching S3 Buckets..." &
+    animation_pid=$!
     # Fetch bucket list
     bucket_list=$(aws s3 ls)
 
+    # Stop the animation
+    kill "$animation_pid" &>/dev/null
+    wait "$animation_pid" 2>/dev/null
+
+    echo ""
+    
     # Check if it's empty
     if [[ -z "$bucket_list" ]]; then
         echo -e "${YELLOW}${BOLD}No S3 buckets found in your account.${RESET}"
