@@ -22,6 +22,8 @@ source scripts/iam/user/aws_iam_remove_user_from_group
 source scripts/iam/user/aws_iam_create_user
 source scripts/iam/user/aws_iam_delete_user
 source scripts/iam/user/aws_iam_user_group_count
+source scripts/iam/user/aws_iam_user_initial_password
+source scripts/iam/user/aws_iam_update_password
 
 
 function aws_iam_mgr(){
@@ -36,21 +38,25 @@ function aws_iam_mgr(){
         echo -e "   ${BOLD}2)${RESET} ➜ List IAM Users"
         echo -e "   ${BOLD}3)${RESET} ➜ Add User to a Group"
         echo -e "   ${BOLD}4)${RESET} ➜ Delete IAM User"
+        echo -e "   ${BOLD}5)${RESET} ➜ Set Initial password for IAM user(in development but works!)"
+        echo -e "   ${BOLD}6)${RESET} ➜ Change password for IAM user(WIP)"
+        echo -e "   ${BOLD}7)${RESET} ➜ Create an access key for an IAM user(WIP)"
+        echo -e "   ${BOLD}8)${RESET} ➜ Delete access key for an IAM user(WIP)"
 
         echo -e "${GREEN}---------------------------------------------${RESET}"
 
         echo -e "${BOLD}${MAGENTA} 🔹 Group Management${RESET}"
-        echo -e "   ${BOLD}5)${RESET} ➜ Create IAM Group"
-        echo -e "   ${BOLD}6)${RESET} ➜ List IAM Groups"
-        echo -e "   ${BOLD}7)${RESET} ➜ Check Total Users in a Group"
-        echo -e "   ${BOLD}8)${RESET} ➜ List Groups a User Belongs To"
-        echo -e "   ${BOLD}9)${RESET} ➜ Delete IAM Group"
-        echo -e "   ${BOLD}10)${RESET} ➜ Remove User from a Group"
+        echo -e "   ${BOLD}9)${RESET} ➜ Create IAM Group"
+        echo -e "   ${BOLD}10)${RESET} ➜ List IAM Groups"
+        echo -e "   ${BOLD}11)${RESET} ➜ Check Total Users in a Group"
+        echo -e "   ${BOLD}12)${RESET} ➜ List Groups a User Belongs To"
+        echo -e "   ${BOLD}13)${RESET} ➜ Delete IAM Group"
+        echo -e "   ${BOLD}14)${RESET} ➜ Remove User from a Group"
 
         echo -e "${GREEN}---------------------------------------------${RESET}"
 
         echo -e "${BOLD}${RED} 🔹 Other Options${RESET}"
-        echo -e "   ${BOLD}11)${RESET} ➜ Back to Main Menu"
+        echo -e "   ${BOLD}15)${RESET} ➜ Back to Main Menu"
 
         echo -e "${GREEN}=============================================${RESET}"
 
@@ -77,31 +83,35 @@ function aws_iam_mgr(){
             bk
             ;;
             5)
+            aws_iam_user_initial_password
+            bk
+            ;;            
+            9)
             aws_iam_create_group
             bk
             ;;
-            6)
+            10)
             aws_iam_list_groups
             bk
             ;;
-            7)
+            11)
             aws_iam_list_users_in_group
             bk
             ;;
-            8)
+            12)
             aws_iam_list_users
             aws_iam_user_group_count
             bk
             ;;
-            9)
+            13)
             aws_iam_delete_group
             bk
             ;;
-            10)
+            14)
             aws_iam_remove_user_from_group
             bk
             ;;
-            11)
+            15)
             echo "Going back to Main Menu"
             break;;
             *)
