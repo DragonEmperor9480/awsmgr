@@ -8,7 +8,15 @@ function aws_s3_create_bucket()
         echo -e "${BOLD}${RED}Please enter a valid name${RESET}"
         return
     fi
+    show_processing_animation "Creating S3 Bucket..." &
+    animation_pid=$!
     output=$(aws s3 mb s3://"$s3_name" 2>&1)
+
+    kill "$animation_pid" &>/dev/null
+    wait "$animation_pid" 2>/dev/null
+
+    echo ""
+
     if echo "$output" | grep -q "BucketAlreadyOwnedByYou"; then
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is already owned by you!${RESET}"
     elif echo -e "$output" | grep -q "BucketAlreadyExists"; then

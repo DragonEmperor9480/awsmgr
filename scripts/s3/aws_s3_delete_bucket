@@ -1,22 +1,22 @@
-#!/bin/bash
-
 function aws_s3_delete_bucket() {
-    # Get list of buckets using your existing function
     aws_s3_list_bucket
-    buckets_output=$(aws_s3_list_bucket)
-
-    # If no buckets found, return
-    if [[ -z "$buckets_output" || "$buckets_output" == *"No S3 buckets found"* ]]; then
-        return
-    fi
 
     read -p "Enter a bucket name you want to delete: " s3_name
 
-    # Try deleting the bucket normally
+    show_processing_animation "Deleting S3 Bucket..." &
+    animation_pid=$!
+
     output=$(aws s3 rb s3://"$s3_name" 2>&1)
+
+    kill "$animation_pid" &>/dev/null
+    wait "$animation_pid" 2>/dev/null
+    echo ""
 
     if echo "$output" | grep -q "AccessDenied"; then
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' doesn't exist or you don't have access!${RESET}"
+
+    elif echo "$output" | grep -q "NoSuchBucket"; then
+        echo -e "${BOLD}${RED}Error: Bucket '$s3_name' does not exist!${RESET}"
 
     elif echo "$output" | grep -q "BucketNotEmpty"; then
         echo -e "${BOLD}${RED}Error: Bucket '$s3_name' is not empty!${RESET}\n"
@@ -26,20 +26,34 @@ function aws_s3_delete_bucket() {
             if [[ "$s3_input" == "y" ]]; then
                 echo -e "${YELLOW}Deleting all objects and versions in the bucket...${RESET}"
 
-                # Delete all versions
-                aws s3api list-object-versions --bucket "$s3_name" --query 'Versions[*].[Key,VersionId]' --output text | \
+                show_processing_animation "Cleaning S3 Bucket..." &
+                animation_pid=$!
+
+                # Delete all object versions
+                aws s3api list-object-versions --bucket "$s3_name" --query 'Versions[*].[Key,VersionId]' --output text |
                 while read -r key version_id; do
                     aws s3api delete-object --bucket "$s3_name" --key "$key" --version-id "$version_id" >/dev/null
                 done
 
                 # Delete all delete markers
-                aws s3api list-object-versions --bucket "$s3_name" --query 'DeleteMarkers[*].[Key,VersionId]' --output text | \
+                aws s3api list-object-versions --bucket "$s3_name" --query 'DeleteMarkers[*].[Key,VersionId]' --output text |
                 while read -r key version_id; do
                     aws s3api delete-object --bucket "$s3_name" --key "$key" --version-id "$version_id" >/dev/null
                 done
 
-                # Try deleting bucket again
+                kill "$animation_pid" &>/dev/null
+                wait "$animation_pid" 2>/dev/null
+                echo ""
+
+                show_processing_animation "Trying to delete bucket again..." &
+                animation_pid=$!
+
                 output=$(aws s3 rb s3://"$s3_name" 2>&1)
+
+                kill "$animation_pid" &>/dev/null
+                wait "$animation_pid" 2>/dev/null
+                echo ""
+
                 if echo "$output" | grep -q "remove_bucket"; then
                     echo -e "${BOLD}${GREEN}Bucket '$s3_name' deleted successfully after cleaning!${RESET}"
                 else
@@ -49,10 +63,10 @@ function aws_s3_delete_bucket() {
                 break
 
             elif [[ "$s3_input" == "n" ]]; then
-                echo "Operation canceled."
+                echo -e "${CYAN}Operation canceled.${RESET}"
                 break
             else
-                echo "Invalid input. Please enter 'y' or 'n'."
+                echo -e "${YELLOW}Invalid input. Please enter 'y' or 'n'.${RESET}"
             fi
         done
 
