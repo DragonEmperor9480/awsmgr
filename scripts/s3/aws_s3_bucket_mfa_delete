@@ -1,0 +1,71 @@
+#!/bin/bash
+
+function aws_s3_bucket_mfa_delete() {
+    aws_s3_list_bucket
+
+    read -p "Enter Bucket Name: " bucket_name
+    if [[ -z "$bucket_name" ]]; then
+        echo -e "${RED}Error: Please enter a valid bucket name.${RESET}"
+        return
+    fi
+
+    # Get current versioning + MFA delete status
+    status_check=$(aws s3api get-bucket-versioning --bucket "$bucket_name" 2>&1)
+
+    read -p "Do you want to Enable or Disable MFA Delete? (e/d): " mfa_detail
+
+    # Parse current status
+    is_enabled=$(echo "$status_check" | grep '"MFADelete": "Enabled"')
+    is_disabled=$(echo "$status_check" | grep '"MFADelete": "Disabled"')
+
+    if [[ "$mfa_detail" == "e" ]]; then
+        if [[ -n "$is_enabled" ]]; then
+            echo -e "${GREEN}✔️ MFA Delete is already enabled for bucket '$bucket_name'.${RESET}"
+            return
+        fi
+    elif [[ "$mfa_detail" == "d" ]]; then
+        if [[ -n "$is_disabled" ]]; then
+            echo -e "${YELLOW}⚠️ MFA Delete is already disabled for bucket '$bucket_name'.${RESET}"
+            return
+        fi
+    else
+        echo -e "${RED}Invalid choice. Please enter 'e' for enable or 'd' for disable.${RESET}"
+        return
+    fi
+
+    # Get security ARN
+    security_arn=$(cat "/home/$USER/.config/awsmgr/aws_config/security_arn_mfa.txt")
+    if [[ -z "$security_arn" ]]; then
+        echo -e "${RED}Error: Security ARN not found. Please check the file.${RESET}"
+        return
+    fi
+
+    read -p "Enter MFA code: " mfa_code
+    if [[ -z "$mfa_code" ]]; then
+        echo -e "${RED}Error: MFA code cannot be empty.${RESET}"
+        return
+    fi
+
+    # Decide what to apply
+    if [[ "$mfa_detail" == "e" ]]; then
+        echo -e "${CYAN}Enabling MFA Delete...${RESET}"
+        versioning_conf="Status=Enabled,MFADelete=Enabled"
+        action_msg="enabled"
+    else
+        echo -e "${CYAN}Disabling MFA Delete...${RESET}"
+        versioning_conf="Status=Enabled,MFADelete=Disabled"
+        action_msg="disabled"
+    fi
+
+    output=$(aws s3api put-bucket-versioning \
+        --bucket "$bucket_name" \
+        --versioning-configuration $versioning_conf \
+        --mfa "$security_arn $mfa_code" 2>&1)
+
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}✔️ MFA Delete successfully $action_msg for bucket '$bucket_name'.${RESET}"
+    else
+        echo -e "${RED}❌ Failed to update MFA Delete setting:${RESET}"
+        echo "$output"
+    fi
+}
