@@ -23,7 +23,7 @@ source scripts/iam/user/aws_iam_create_user
 source scripts/iam/user/aws_iam_delete_user
 source scripts/iam/user/aws_iam_user_group_count
 source scripts/iam/user/aws_iam_user_initial_password
-source scripts/iam/user/aws_iam_update_password
+source scripts/iam/user/aws_iam_user_update_password
 
 
 function aws_iam_mgr(){
@@ -39,7 +39,7 @@ function aws_iam_mgr(){
         echo -e "   ${BOLD}3)${RESET} ➜ Add User to a Group"
         echo -e "   ${BOLD}4)${RESET} ➜ Delete IAM User"
         echo -e "   ${BOLD}5)${RESET} ➜ Set Initial password for IAM user(in development but works!)"
-        echo -e "   ${BOLD}6)${RESET} ➜ Change password for IAM user(WIP)"
+        echo -e "   ${BOLD}6)${RESET} ➜ Change password for IAM user(in development but works!)"
         echo -e "   ${BOLD}7)${RESET} ➜ Create an access key for an IAM user(WIP)"
         echo -e "   ${BOLD}8)${RESET} ➜ Delete access key for an IAM user(WIP)"
 
@@ -85,7 +85,11 @@ function aws_iam_mgr(){
             5)
             aws_iam_user_initial_password
             bk
-            ;;            
+            ;;  
+            6)
+            aws_iam_user_update_password
+            bk
+            ;;
             9)
             aws_iam_create_group
             bk
