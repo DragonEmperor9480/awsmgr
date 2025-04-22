@@ -29,7 +29,7 @@ function aws_iam_mgr() {
     while true; do
         clear
         echo -e "${GREEN}┌──────────────────────────────────────────────┐${RESET}"
-        echo -e "${GREEN}│${RESET}        ${BOLD}${CYAN}AWS IAM MANAGEMENT CONSOLE${RESET}           ${GREEN}│${RESET}"
+        echo -e "${GREEN}│${RESET}        ${BOLD}${CYAN}AWS IAM MANAGEMENT CONSOLE${RESET}            ${GREEN}│${RESET}"
         echo -e "${GREEN}└──────────────────────────────────────────────┘${RESET}"
         echo
 
