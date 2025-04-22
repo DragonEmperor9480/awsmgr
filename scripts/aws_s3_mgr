@@ -1,52 +1,65 @@
 #!/bin/bash
 
-#colors
+# colors
 source scripts/colors
 
+# include all required S3 scripts
 source scripts/s3/aws_s3_create_bucket
 source scripts/s3/aws_s3_list_bucket
 source scripts/s3/aws_s3_delete_bucket
 source scripts/s3/aws_s3_list_bucket_objects
+source scripts/s3/aws_s3_bucket_mfa_delete
 
-
-function aws_s3_mgr()
-{
+function aws_s3_mgr() {
     while true; do
-        echo -e "${GREEN}---------------------------------${RESET}"
-        echo -e "${BOLD}1) Create S3 Bucket${RESET}"
-        echo -e "${BOLD}2) List S3 Buckets${RESET}"
-        echo -e "${BOLD}3) Delete S3 Bucket${RESET}"
-        echo -e "${BOLD}4) List S3 Bucket Objects${RESET}"
-        echo -e "${BOLD}5) Exit ${RESET}"
+        clear
+        echo -e "${GREEN}┌──────────────────────────────────────────────┐${RESET}"
+        echo -e "${GREEN}│${RESET}         ${BOLD}${CYAN}AWS S3 MANAGEMENT CONSOLE${RESET}            ${GREEN}│${RESET}"
+        echo -e "${GREEN}└──────────────────────────────────────────────┘${RESET}"
+        echo
 
+        echo -e "${BOLD}${YELLOW}Choose an option below:${RESET}"
+        echo
 
-        read -p "choose an option: " s3_num
+        echo -e "  ${BOLD}1)${RESET}  Create S3 Bucket"
+        echo -e "  ${BOLD}2)${RESET}  List S3 Buckets"
+        echo -e "  ${BOLD}3)${RESET}  Delete S3 Bucket"
+        echo -e "  ${BOLD}4)${RESET}  List Objects in a Bucket"
+        echo -e "  ${BOLD}5)${RESET}  Enable/Disable MFA Delete on Bucket"
+        echo -e "  ${BOLD}6)${RESET}  Back to Main Menu"
+        echo
+
+        read -p "Enter your choice: " s3_num
+        echo
 
         case $s3_num in
             1)
-            aws_s3_create_bucket
-            bk
-            ;;
+                aws_s3_create_bucket
+                bk
+                ;;
             2)
-            aws_s3_list_bucket
-            bk
-            ;;
+                aws_s3_list_bucket
+                bk
+                ;;
             3)
-            aws_s3_delete_bucket
-            bk
-            ;;
+                aws_s3_delete_bucket
+                bk
+                ;;
             4)
-            aws_s3_list_bucket_objects
-            bk
-            ;;
+                aws_s3_list_bucket_objects
+                bk
+                ;;
             5)
-            break
-            ;;
+                aws_s3_bucket_mfa_delete
+                bk
+                ;;
+            6)
+                break
+                ;;
             *)
-            echo "Invalid Input"
-            sleep 1
-            ;;
+                echo -e "${RED}Invalid Input. Please try again.${RESET}"
+                sleep 1
+                ;;
         esac
-    done    
-
+    done
 }

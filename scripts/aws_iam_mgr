@@ -1,21 +1,21 @@
 #!/bin/bash
 
-#Animation
+# Animation
 source scripts/utils/show_processing_animation
 
-#Back menu
+# Back menu
 source scripts/utils/bk
 
-#colors
+# Colors
 source scripts/colors
 
-#groups
+# Groups
 source scripts/iam/groups/aws_iam_create_group
 source scripts/iam/groups/aws_iam_delete_group
 source scripts/iam/groups/aws_iam_list_groups
 source scripts/iam/groups/aws_iam_list_users_in_group
 
-#User
+# Users
 source scripts/iam/user/aws_iam_add_user_to_group
 source scripts/iam/user/aws_iam_list_users
 source scripts/iam/user/aws_iam_remove_user_from_group
@@ -25,112 +25,98 @@ source scripts/iam/user/aws_iam_user_group_count
 source scripts/iam/user/aws_iam_user_initial_password
 source scripts/iam/user/aws_iam_user_update_password
 
-
-function aws_iam_mgr(){
+function aws_iam_mgr() {
     while true; do
+        clear
+        echo -e "${GREEN}┌──────────────────────────────────────────────┐${RESET}"
+        echo -e "${GREEN}│${RESET}        ${BOLD}${CYAN}AWS IAM MANAGEMENT CONSOLE${RESET}           ${GREEN}│${RESET}"
+        echo -e "${GREEN}└──────────────────────────────────────────────┘${RESET}"
+        echo
 
-        echo -e "${GREEN}=============================================${RESET}"
-        echo -e "${BOLD}${CYAN}          AWS IAM MANAGEMENT MENU            ${RESET}"
-        echo -e "${GREEN}=============================================${RESET}"
+        echo -e "${BOLD}${YELLOW}User Management:${RESET}"
+        echo -e "  ${BOLD}1)${RESET} Create IAM User"
+        echo -e "  ${BOLD}2)${RESET} List IAM Users"
+        echo -e "  ${BOLD}3)${RESET} Add User to a Group"
+        echo -e "  ${BOLD}4)${RESET} Delete IAM User"
+        echo -e "  ${BOLD}5)${RESET} Set Initial password for IAM user"
+        echo -e "  ${BOLD}6)${RESET} Change password for IAM user"
+        echo -e "  ${BOLD}7)${RESET} Create an access key for an IAM user (WIP)"
+        echo -e "  ${BOLD}8)${RESET} Delete access key for an IAM user (WIP)"
+        echo
 
-        echo -e "${BOLD}${YELLOW} 🔹 User Management${RESET}"
-        echo -e "   ${BOLD}1)${RESET} ➜ Create IAM User"
-        echo -e "   ${BOLD}2)${RESET} ➜ List IAM Users"
-        echo -e "   ${BOLD}3)${RESET} ➜ Add User to a Group"
-        echo -e "   ${BOLD}4)${RESET} ➜ Delete IAM User"
-        echo -e "   ${BOLD}5)${RESET} ➜ Set Initial password for IAM user(in development but works!)"
-        echo -e "   ${BOLD}6)${RESET} ➜ Change password for IAM user(in development but works!)"
-        echo -e "   ${BOLD}7)${RESET} ➜ Create an access key for an IAM user(WIP)"
-        echo -e "   ${BOLD}8)${RESET} ➜ Delete access key for an IAM user(WIP)"
+        echo -e "${BOLD}${YELLOW}Group Management:${RESET}"
+        echo -e "  ${BOLD}9)${RESET}  Create IAM Group"
+        echo -e "  ${BOLD}10)${RESET} List IAM Groups"
+        echo -e "  ${BOLD}11)${RESET} Check Total Users in a Group"
+        echo -e "  ${BOLD}12)${RESET} List Groups a User Belongs To"
+        echo -e "  ${BOLD}13)${RESET} Delete IAM Group"
+        echo -e "  ${BOLD}14)${RESET} Remove User from a Group"
+        echo
 
-        echo -e "${GREEN}---------------------------------------------${RESET}"
-
-        echo -e "${BOLD}${MAGENTA} 🔹 Group Management${RESET}"
-        echo -e "   ${BOLD}9)${RESET} ➜ Create IAM Group"
-        echo -e "   ${BOLD}10)${RESET} ➜ List IAM Groups"
-        echo -e "   ${BOLD}11)${RESET} ➜ Check Total Users in a Group"
-        echo -e "   ${BOLD}12)${RESET} ➜ List Groups a User Belongs To"
-        echo -e "   ${BOLD}13)${RESET} ➜ Delete IAM Group"
-        echo -e "   ${BOLD}14)${RESET} ➜ Remove User from a Group"
-
-        echo -e "${GREEN}---------------------------------------------${RESET}"
-
-        echo -e "${BOLD}${RED} 🔹 Other Options${RESET}"
-        echo -e "   ${BOLD}15)${RESET} ➜ Back to Main Menu"
-
-        echo -e "${GREEN}=============================================${RESET}"
-
+        echo -e "  ${BOLD}15)${RESET} Back to Main Menu"
+        echo
 
         read -p "Choose an option: " iam_num
+        echo
 
         case $iam_num in
             1)
-            aws_iam_create_user
-            bk
-            ;;
-            
+                aws_iam_create_user
+                bk
+                ;;
             2)
-            aws_iam_list_users
-            bk
-            ;;
-
+                aws_iam_list_users
+                bk
+                ;;
             3)
-            aws_iam_add_user_to_group
-            bk
-            ;;
+                aws_iam_add_user_to_group
+                bk
+                ;;
             4)
-            aws_iam_delete_user
-            bk
-            ;;
+                aws_iam_delete_user
+                bk
+                ;;
             5)
-            aws_iam_user_initial_password
-            bk
-            ;;  
+                aws_iam_user_initial_password
+                bk
+                ;;
             6)
-            aws_iam_user_update_password
-            bk
-            ;;
+                aws_iam_user_update_password
+                bk
+                ;;
             9)
-            aws_iam_create_group
-            bk
-            ;;
+                aws_iam_create_group
+                bk
+                ;;
             10)
-            aws_iam_list_groups
-            bk
-            ;;
+                aws_iam_list_groups
+                bk
+                ;;
             11)
-            aws_iam_list_users_in_group
-            bk
-            ;;
+                aws_iam_list_users_in_group
+                bk
+                ;;
             12)
-            aws_iam_list_users
-            aws_iam_user_group_count
-            bk
-            ;;
+                aws_iam_list_users
+                aws_iam_user_group_count
+                bk
+                ;;
             13)
-            aws_iam_delete_group
-            bk
-            ;;
+                aws_iam_delete_group
+                bk
+                ;;
             14)
-            aws_iam_remove_user_from_group
-            bk
-            ;;
+                aws_iam_remove_user_from_group
+                bk
+                ;;
             15)
-            echo "Going back to Main Menu"
-            break;;
+                echo "Going back to Main Menu"
+                break
+                ;;
             *)
-            echo "Invalid Input"
-            sleep 1
-            ;;
+                echo -e "${RED}Invalid Input. Please try again.${RESET}"
+                sleep 1
+                ;;
         esac
     done
-
-
 }
-
-
-
-
-
-
-
