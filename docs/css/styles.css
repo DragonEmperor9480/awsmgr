@@ -194,12 +194,13 @@ body {
 /* Terminal */
 .terminal {
     background: var(--terminal-bg);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow-x: hidden;
     max-width: 100%;
     margin: 0 auto;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     animation: float 6s ease-in-out infinite;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .terminal-header {
@@ -232,21 +233,24 @@ body {
 }
 
 .terminal-body {
-    padding: 1rem;
+    padding: 1.5rem;
     overflow-x: auto;
     font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
 }
 
 .terminal-body pre {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* Terminal text color fix */
 .terminal-body pre code {
-    color: #e2e8f0 !important; /* Force light color for both themes */
+    color: #e2e8f0 !important;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 /* Features Section */
@@ -650,9 +654,9 @@ input:checked + .theme-slider:before {
     width: 28px;
 }
 
-/* Add beta badge styles */
-.beta-badge {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+/* Add stable badge styles to replace beta badge */
+.stable-badge {
+    background: linear-gradient(45deg, #2ecc71, #27ae60);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
@@ -661,13 +665,6 @@ input:checked + .theme-slider:before {
     margin-left: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
 }
 
 @media (max-width: 768px) {
@@ -680,10 +677,6 @@ input:checked + .theme-slider:before {
     }
 
     .version {
-        font-size: 0.8rem;
-    }
-
-    .beta-badge {
         font-size: 0.8rem;
     }
 
@@ -1532,4 +1525,112 @@ section {
     background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0z' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: -1;
+}
+
+/* Add animated cursor for terminal */
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background-color: #e2e8f0;
+    animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* MFA documentation styles */
+.mfa-note {
+    border-left: 4px solid #9b59b6; /* Purple color for security-related content */
+    margin-top: 3rem;
+}
+
+.mfa-note .note-icon i {
+    background: rgba(155, 89, 182, 0.1);
+    color: #9b59b6;
+}
+
+.setup-steps {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.setup-steps li {
+    margin-bottom: 1.5rem;
+}
+
+.setup-steps ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.setup-steps ul li {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    color: var(--text-light);
+}
+
+.step-code {
+    margin: 0.75rem 0;
+    position: relative;
+}
+
+.note-tip {
+    background: rgba(241, 196, 15, 0.1);
+    border-left: 3px solid #f1c40f;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.95rem;
+}
+
+.note-tip i {
+    margin-right: 0.5rem;
+    color: #f1c40f;
+}
+
+code {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+}
+
+[data-theme="dark"] code {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile responsiveness for MFA documentation */
+@media (max-width: 768px) {
+    .setup-steps {
+        padding-left: 1rem;
+    }
+    
+    .setup-steps ul {
+        padding-left: 1rem;
+    }
+}
+
+/* Update logo to be a proper link */
+.logo-link {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.logo-link:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.logo-link i {
+    margin-right: 0.5rem;
 } 

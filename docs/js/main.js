@@ -191,23 +191,24 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.warn('Error loading notices:', error);
             noticeContainer.innerHTML = `
-                <div class="notice-card notice-type-info">
-                    <div class="notice-header">
-                        <div class="notice-title">
-                            <i class="fas fa-info-circle"></i>
-                            Beta Status
-                        </div>
-                        <div class="notice-date">2024-03</div>
-                    </div>
-                    <div class="notice-message">
-                        As this project is in beta stage, continuous fixes are being made and some bugs might be present.
-                        Please report any issues on GitHub.
-                    </div>
-                </div>
                 <div class="notice-card notice-type-update">
                     <div class="notice-header">
                         <div class="notice-title">
                             <i class="fas fa-bell"></i>
+                            First Stable Release
+                        </div>
+                        <div class="notice-date">2024-03</div>
+                    </div>
+                    <div class="notice-message">
+                        We are excited to announce the first stable release of AWSMGR v1.0.0! This release includes 
+                        complete IAM user management capabilities including password management, S3 operations, 
+                        and a refined user interface.
+                    </div>
+                </div>
+                <div class="notice-card notice-type-info">
+                    <div class="notice-header">
+                        <div class="notice-title">
+                            <i class="fas fa-info-circle"></i>
                             Platform Support
                         </div>
                         <div class="notice-date">2024-03</div>
@@ -280,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
             
-            // Fallback to hardcoded todos if fetch fails
+            // Fallback to hardcoded todos - remove the IAM user password management
             const fallbackTodos = [
                 {
                     task: "Improve design",
@@ -294,11 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 {
                     task: "Add user policy support",
-                    status: "planned",
-                    priority: "medium"
-                },
-                {
-                    task: "Add IAM user password management",
                     status: "planned",
                     priority: "medium"
                 }

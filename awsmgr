@@ -8,7 +8,7 @@ clear
 
 # Print a compact, professional header
 echo -e "${BOLD}${BLUE}┌─────────────────────────────────┐${RESET}"
-echo -e "${BOLD}${BLUE}│        AWS CLI MANAGER v0.9.0   │ ${CYAN}BETA${RESET}"
+echo -e "${BOLD}${BLUE}│        AWS CLI MANAGER v1.0.0   │ ${CYAN}STABLE${RESET}"
 echo -e "${BOLD}${BLUE}└─────────────────────────────────┘${RESET}"
 
 # Function to display menu options in a more compact format

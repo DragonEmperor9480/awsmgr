@@ -14,8 +14,10 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <i class="fas fa-terminal"></i>
-                <span>AWSMGR</span>
+                <a href="#" class="logo-link">
+                    <i class="fas fa-terminal"></i>
+                    <span>AWSMGR</span>
+                </a>
             </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
@@ -38,7 +40,7 @@
 
     <header class="hero">
         <div class="container">
-            <h1>AWSMGR <span class="version">v0.9.0</span><span class="beta-badge">Beta</span></h1>
+            <h1>AWSMGR <span class="version">v1.0.0</span><span class="stable-badge">Stable</span></h1>
             <p class="subtitle">Streamline your AWS CLI operations with an intuitive terminal interface</p>
             <div class="cta-buttons">
                 <a href="#installation" class="btn btn-primary">Get Started</a>
@@ -56,17 +58,18 @@
                 <div class="terminal-body">
                     <pre><code class="typing" style="color: #e2e8f0;">$ awsmgr
 
-┌───────────────────┐
-│  AWS CLI MANAGER  │ BETA
-└───────────────────┘
+┌─────────────────────────────────┐
+│        AWS CLI MANAGER v1.0.0   │ <span style="color: #2ecc71;">STABLE</span>
+└─────────────────────────────────┘
 
 Available services:
-──────────────────
-[1] IAM
-[2] EC2
-[3] S3
-[4] Exit
-──────────────────</code></pre>
+────────────────────────────────────
+<span style="color: #3498db; font-weight: bold;">[1]</span> <span style="color: #e2e8f0; font-weight: bold;">IAM</span> - Identity and Access Management
+<span style="color: #3498db; font-weight: bold;">[2]</span> <span style="color: #e2e8f0; font-weight: bold;">EC2</span> - Elastic Compute Cloud
+<span style="color: #3498db; font-weight: bold;">[3]</span> <span style="color: #e2e8f0; font-weight: bold;">S3</span>  - Simple Storage Service
+<span style="color: #e74c3c; font-weight: bold;">[4]</span> <span style="color: #e2e8f0; font-weight: bold;">Exit</span>
+────────────────────────────────────
+<span style="color: #3498db;">Select option [1-4]:</span> <span class="cursor">|</span></code></pre>
                 </div>
             </div>
         </div>
@@ -131,7 +134,7 @@ Available services:
                 <div class="step">
                     <h3>1. Clone Repository</h3>
                     <div class="code-block">
-                        <pre><code>git clone https://github.com/DragonEmperor9480/awsmgr.git</code></pre>
+                        <pre><code id="clone-command">git clone https://github.com/DragonEmperor9480/awsmgr.git</code></pre>
                         <button class="copy-btn" data-clipboard-target="#clone-command">
                             <i class="far fa-copy"></i>
                         </button>
@@ -140,15 +143,21 @@ Available services:
                 <div class="step">
                     <h3>2. Run Install Script</h3>
                     <div class="code-block">
-                        <pre><code>cd awsmgr
+                        <pre><code id="install-command">cd awsmgr
 chmod +x install.sh
 ./install.sh</code></pre>
+                        <button class="copy-btn" data-clipboard-target="#install-command">
+                            <i class="far fa-copy"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="step">
                     <h3>3. Start Using AWSMGR</h3>
                     <div class="code-block">
-                        <pre><code>awsmgr</code></pre>
+                        <pre><code id="start-command">awsmgr</code></pre>
+                        <button class="copy-btn" data-clipboard-target="#start-command">
+                            <i class="far fa-copy"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -173,6 +182,40 @@ chmod +x install.sh
                 </div>
             </div>
             
+            <!-- Add new note box for MFA delete -->
+            <div class="note-box mfa-note">
+                <div class="note-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="note-content">
+                    <h3>Setting Up MFA Delete for S3 Buckets</h3>
+                    <p>To use the S3 MFA Delete feature, you need to configure your MFA device's ARN in AWSMGR:</p>
+                    
+                    <ol class="setup-steps">
+                        <li>
+                            <strong>Find your MFA device ARN</strong> in the AWS Console:
+                            <ul>
+                                <li>Go to IAM → Users → Your Username → Security credentials</li>
+                                <li>Under "Multi-factor authentication (MFA)", find your MFA device</li>
+                                <li>Copy the device ARN (looks like: <code>arn:aws:iam::123456789012:mfa/username</code>)</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Save your MFA ARN</strong> to the AWSMGR config file:
+                            <div class="code-block step-code">
+                                <pre><code id="mfa-config-command">echo "YOUR_MFA_DEVICE_ARN" > /home/$USER/.config/awsmgr/aws_config/security_arn_mfa.txt</code></pre>
+                                <button class="copy-btn" data-clipboard-target="#mfa-config-command">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="note-tip"><i class="fas fa-lightbulb"></i> Replace <code>YOUR_MFA_DEVICE_ARN</code> with your actual MFA device ARN from step 1.</p>
+                        </li>
+                    </ol>
+                    
+                    <p>After completing these steps, you can use the "Enable/Disable MFA Delete on Bucket" option in the S3 management menu.</p>
+                </div>
+            </div>
+            
             <!-- Rest of documentation content -->
             <div class="documentation-content">
                 <div class="doc-grid">
@@ -183,6 +226,8 @@ chmod +x install.sh
                             <li>Manage Groups</li>
                             <li>List Users/Groups</li>
                             <li>User-Group Operations</li>
+                            <li>Set Initial User Password</li>
+                            <li>Change User Password</li>
                         </ul>
                     </div>
                     <div class="doc-card">
@@ -192,6 +237,13 @@ chmod +x install.sh
                             <li>List Buckets</li>
                             <li>Delete Buckets</li>
                             <li>List Objects</li>
+                            <li>Enable/Disable MFA Delete</li>
+                        </ul>
+                    </div>
+                    <div class="doc-card">
+                        <h3>EC2 Commands</h3>
+                        <ul>
+                            <li>EC2 Management (Coming Soon)</li>
                         </ul>
                     </div>
                 </div>
@@ -230,7 +282,7 @@ chmod +x install.sh
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Amrutesh Naregal. All rights reserved.</p>
+                <p>&copy; 2025 Amrutesh Naregal. All rights reserved.</p>
             </div>
         </div>
     </footer>
