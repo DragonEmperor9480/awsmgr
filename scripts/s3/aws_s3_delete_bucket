@@ -1,5 +1,10 @@
 function aws_s3_delete_bucket() {
     aws_s3_list_bucket
+    
+    bucket_status=$(aws s3 ls)
+    if [[ -z "$bucket_status" ]]; then
+    return
+    fi
 
     read -p "Enter a bucket name you want to delete: " s3_name
 
