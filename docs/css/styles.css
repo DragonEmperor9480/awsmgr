@@ -246,11 +246,59 @@ body {
     font-size: 15px;
 }
 
-/* Terminal text color fix */
+/* Clean rendering for terminal text */
 .terminal-body pre code {
     color: #e2e8f0 !important;
-    font-size: 15px;
-    line-height: 1.6;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    font-weight: normal !important;
+    letter-spacing: normal !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+/* Strong fix for terminal text shadows */
+.terminal-body pre code,
+.terminal-body pre code *,
+.terminal-body pre span,
+.terminal-body code,
+.terminal-body span,
+.code-block pre,
+.code-block code,
+.code-block span {
+    text-shadow: none !important;
+    -webkit-text-shadow: none !important;
+    -moz-text-shadow: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+}
+
+[data-theme="dark"] .terminal *,
+[data-theme="dark"] .code-block * {
+    text-shadow: none !important;
+    -webkit-text-shadow: none !important;
+    -moz-text-shadow: none !important;
+}
+
+/* Fix for copy text areas */
+.code-block,
+.code-inline,
+.code-block * {
+    text-shadow: none !important;
+    -webkit-text-shadow: none !important;
+    -moz-text-shadow: none !important;
+}
+
+/* Add this to override any filter that might be causing shadow effects */
+.terminal,
+.terminal *,
+.code-block,
+.code-block * {
+    filter: none !important;
+    -webkit-filter: none !important;
 }
 
 /* Features Section */
@@ -1633,4 +1681,188 @@ code {
 
 .logo-link i {
     margin-right: 0.5rem;
+}
+
+/* Changelog Section */
+.changelog {
+    padding: 6rem 0;
+    background-color: var(--background-color);
+}
+
+.changelog h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--secondary-color);
+}
+
+.version-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.version-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.version-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.version-card.past {
+    opacity: 0.9;
+}
+
+.version-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.version-header h3 {
+    margin: 0;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.version-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.version-badge.stable {
+    background: linear-gradient(45deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.version-badge.beta {
+    background: linear-gradient(45deg, #f1c40f, #f39c12);
+    color: white;
+}
+
+.release-date {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    background: var(--background-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+}
+
+.version-content {
+    padding: 1.5rem;
+}
+
+.version-description {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.change-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.change-list li {
+    display: flex;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+}
+
+.change-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.change-icon.feature {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.change-icon.improvement {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.change-icon.bugfix {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.change-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.change-title {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.25rem;
+}
+
+.change-details {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Remove the collapsed class styles */
+.change-list.collapsed li:nth-child(n+4) {
+    display: flex; /* Change from 'none' to 'flex' to always show all items */
+}
+
+/* Hide the expand-changes button as it's now unnecessary */
+.expand-changes {
+    display: none;
+}
+
+.changelog-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 3rem auto 0;
+}
+
+.changelog-footer p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* Mobile responsiveness for changelog */
+@media (max-width: 768px) {
+    .version-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .release-date {
+        align-self: flex-start;
+    }
+    
+    .change-list li {
+        gap: 0.75rem;
+    }
 } 

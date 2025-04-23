@@ -24,6 +24,7 @@
                 <a href="#screenshots">Screenshots</a>
                 <a href="#installation">Installation</a>
                 <a href="#documentation">Documentation</a>
+                <a href="#changelog">Changelog</a>
                 <label class="theme-switch" for="theme-toggle">
                     <input type="checkbox" id="theme-toggle">
                     <span class="theme-slider"></span>
@@ -55,21 +56,22 @@
                     </div>
                     <div class="terminal-title">awsmgr</div>
                 </div>
-                <div class="terminal-body">
-                    <pre><code class="typing" style="color: #e2e8f0;">$ awsmgr
+                <div class="terminal-body" style="background-color: var(--terminal-bg); padding: 1.5rem;">
+                    <!-- Raw text with minimal styling -->
+                    <div style="font-family: 'JetBrains Mono', monospace; color: #e2e8f0; line-height: 1.6; font-size: 15px; white-space: pre;">$ awsmgr
 
 ┌─────────────────────────────────┐
-│        AWS CLI MANAGER v1.0.0   │ <span style="color: #2ecc71;">STABLE</span>
+│        AWS CLI MANAGER v1.0.0   │ <span style="color: #2ecc71; background: transparent;">STABLE</span>
 └─────────────────────────────────┘
 
 Available services:
 ────────────────────────────────────
-<span style="color: #3498db; font-weight: bold;">[1]</span> <span style="color: #e2e8f0; font-weight: bold;">IAM</span> - Identity and Access Management
-<span style="color: #3498db; font-weight: bold;">[2]</span> <span style="color: #e2e8f0; font-weight: bold;">EC2</span> - Elastic Compute Cloud
-<span style="color: #3498db; font-weight: bold;">[3]</span> <span style="color: #e2e8f0; font-weight: bold;">S3</span>  - Simple Storage Service
-<span style="color: #e74c3c; font-weight: bold;">[4]</span> <span style="color: #e2e8f0; font-weight: bold;">Exit</span>
+<span style="color: #3498db; background: transparent;">[1]</span> <span style="color: #e2e8f0; background: transparent;">IAM</span> - Identity and Access Management
+<span style="color: #3498db; background: transparent;">[2]</span> <span style="color: #e2e8f0; background: transparent;">EC2</span> - Elastic Compute Cloud
+<span style="color: #3498db; background: transparent;">[3]</span> <span style="color: #e2e8f0; background: transparent;">S3</span>  - Simple Storage Service
+<span style="color: #e74c3c; background: transparent;">[4]</span> <span style="color: #e2e8f0; background: transparent;">Exit</span>
 ────────────────────────────────────
-<span style="color: #3498db;">Select option [1-4]:</span> <span class="cursor">|</span></code></pre>
+<span style="color: #3498db; background: transparent;">Select option [1-4]:</span> <span class="cursor" style="background: transparent;">|</span></div>
                 </div>
             </div>
         </div>
@@ -133,29 +135,34 @@ Available services:
             <div class="install-steps">
                 <div class="step">
                     <h3>1. Clone Repository</h3>
-                    <div class="code-block">
-                        <pre><code id="clone-command">git clone https://github.com/DragonEmperor9480/awsmgr.git</code></pre>
-                        <button class="copy-btn" data-clipboard-target="#clone-command">
+                    <div class="code-block" style="background-color: var(--terminal-bg); position: relative;">
+                        <!-- Raw text with no styling -->
+                        <div style="font-family: 'JetBrains Mono', monospace; color: #e2e8f0; padding: 1rem; white-space: pre; overflow: auto; background: transparent;">git clone https://github.com/DragonEmperor9480/awsmgr.git</div>
+                        <button class="copy-btn" data-clipboard-text="git clone https://github.com/DragonEmperor9480/awsmgr.git" style="position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #a0aec0; cursor: pointer;">
                             <i class="far fa-copy"></i>
                         </button>
                     </div>
                 </div>
                 <div class="step">
                     <h3>2. Run Install Script</h3>
-                    <div class="code-block">
-                        <pre><code id="install-command">cd awsmgr
+                    <div class="code-block" style="background-color: var(--terminal-bg); position: relative;">
+                        <!-- Raw text with no styling -->
+                        <div style="font-family: 'JetBrains Mono', monospace; color: #e2e8f0; padding: 1rem; white-space: pre; overflow: auto; background: transparent;">cd awsmgr
 chmod +x install.sh
-./install.sh</code></pre>
-                        <button class="copy-btn" data-clipboard-target="#install-command">
+./install.sh</div>
+                        <button class="copy-btn" data-clipboard-text="cd awsmgr
+chmod +x install.sh
+./install.sh" style="position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #a0aec0; cursor: pointer;">
                             <i class="far fa-copy"></i>
                         </button>
                     </div>
                 </div>
                 <div class="step">
                     <h3>3. Start Using AWSMGR</h3>
-                    <div class="code-block">
-                        <pre><code id="start-command">awsmgr</code></pre>
-                        <button class="copy-btn" data-clipboard-target="#start-command">
+                    <div class="code-block" style="background-color: var(--terminal-bg); position: relative;">
+                        <!-- Raw text with no styling -->
+                        <div style="font-family: 'JetBrains Mono', monospace; color: #e2e8f0; padding: 1rem; white-space: pre; overflow: auto; background: transparent;">awsmgr</div>
+                        <button class="copy-btn" data-clipboard-text="awsmgr" style="position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #a0aec0; cursor: pointer;">
                             <i class="far fa-copy"></i>
                         </button>
                     </div>
@@ -202,9 +209,10 @@ chmod +x install.sh
                         </li>
                         <li>
                             <strong>Save your MFA ARN</strong> to the AWSMGR config file:
-                            <div class="code-block step-code">
-                                <pre><code id="mfa-config-command">echo "YOUR_MFA_DEVICE_ARN" > /home/$USER/.config/awsmgr/aws_config/security_arn_mfa.txt</code></pre>
-                                <button class="copy-btn" data-clipboard-target="#mfa-config-command">
+                            <div class="code-block step-code" style="background-color: var(--terminal-bg); position: relative;">
+                                <!-- Raw text with no styling -->
+                                <div style="font-family: 'JetBrains Mono', monospace; color: #e2e8f0; padding: 1rem; white-space: pre; overflow: auto; background: transparent;">echo "YOUR_MFA_DEVICE_ARN" > ~/.config/awsmgr/aws_config/security_arn_mfa.txt</div>
+                                <button class="copy-btn" data-clipboard-text="echo "YOUR_MFA_DEVICE_ARN" > ~/.config/awsmgr/aws_config/security_arn_mfa.txt" style="position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #a0aec0; cursor: pointer;">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -251,6 +259,118 @@ chmod +x install.sh
         </div>
     </section>
 
+    <section id="changelog" class="changelog">
+        <div class="container">
+            <h2>Changelog</h2>
+            <div class="version-container">
+                <div class="version-card">
+                    <div class="version-header">
+                        <h3>Version 1.0.0 <span class="version-badge stable">STABLE</span></h3>
+                        <span class="release-date">March 2025</span>
+                    </div>
+                    <div class="version-content">
+                        <p class="version-description">First stable release with significant improvements over the beta version.</p>
+                        <ul class="change-list">
+                            <li>
+                                <i class="fas fa-shield-alt change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Added MFA Delete for S3 Buckets</span>
+                                    <span class="change-details">Secure your S3 buckets with multi-factor authentication delete protection</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-key change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">IAM Password Management</span>
+                                    <span class="change-details">Set initial passwords and update existing passwords for IAM users</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-paint-brush change-icon improvement"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Redesigned User Interface</span>
+                                    <span class="change-details">Improved terminal UI with clearer navigation and visual feedback</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-brush change-icon improvement"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Enhanced Animations</span>
+                                    <span class="change-details">Smoother transitions and loading indicators</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-arrow-left change-icon improvement"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Back Menu Navigation</span>
+                                    <span class="change-details">Added back menu option for all screens for easier navigation</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-trash-alt change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Force Delete Operations</span>
+                                    <span class="change-details">Force delete buckets, users, and groups when needed</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-bug change-icon bugfix"></i>
+                                <div class="change-info">
+                                    <span class="change-title">S3 Bugfixes</span>
+                                    <span class="change-details">Fixed several issues with S3 bucket management</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-exclamation-triangle change-icon bugfix"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Empty Value Handling</span>
+                                    <span class="change-details">Improved handling of empty buckets and empty string inputs</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="version-card past">
+                    <div class="version-header">
+                        <h3>Version 0.9.0 <span class="version-badge beta">BETA</span></h3>
+                        <span class="release-date">January 2025</span>
+                    </div>
+                    <div class="version-content">
+                        <p class="version-description">Initial beta release with core functionality.</p>
+                        <ul class="change-list">
+                            <li>
+                                <i class="fas fa-plus change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Basic IAM User Management</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-plus change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Basic S3 Bucket Operations</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-plus change-icon feature"></i>
+                                <div class="change-info">
+                                    <span class="change-title">Terminal-based Interface</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="changelog-footer">
+                <p>For the complete changelog, visit our GitHub repository.</p>
+                <a href="https://github.com/DragonEmperor9480/awsmgr/releases" class="btn btn-secondary">
+                    <i class="fas fa-history"></i> Full Changelog
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section id="roadmap" class="roadmap">
         <div class="container">
             <h2>Development Roadmap</h2>
@@ -278,6 +398,7 @@ chmod +x install.sh
                     <a href="#screenshots">Screenshots</a>
                     <a href="#installation">Installation</a>
                     <a href="#documentation">Documentation</a>
+                    <a href="#changelog">Changelog</a>
                     <a href="https://github.com/DragonEmperor9480/awsmgr/issues">Report Issues</a>
                 </div>
             </div>

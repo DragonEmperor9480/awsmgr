@@ -69,8 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copy to clipboard functionality
     document.querySelectorAll('.copy-btn').forEach(button => {
         button.addEventListener('click', () => {
-            const codeBlock = button.parentElement.querySelector('code');
-            navigator.clipboard.writeText(codeBlock.textContent.trim());
+            // Check if the button has a data-clipboard-text attribute
+            const textToCopy = button.getAttribute('data-clipboard-text') || 
+                              button.parentElement.querySelector('div').textContent.trim();
+            
+            navigator.clipboard.writeText(textToCopy);
             
             // Visual feedback
             button.innerHTML = '<i class="fas fa-check"></i>';
@@ -197,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-bell"></i>
                             First Stable Release
                         </div>
-                        <div class="notice-date">2024-03</div>
+                        <div class="notice-date">2025-03</div>
                     </div>
                     <div class="notice-message">
                         We are excited to announce the first stable release of AWSMGR v1.0.0! This release includes 
@@ -211,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-info-circle"></i>
                             Platform Support
                         </div>
-                        <div class="notice-date">2024-03</div>
+                        <div class="notice-date">2025-03</div>
                     </div>
                     <div class="notice-message">
                         Currently available for Linux. Windows support coming soon!
@@ -392,6 +395,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: "S3 Menu",
                     description: "S3 bucket management options for creating, listing and managing storage",
                     image: "assets/s3_menu.png",
+                    category: "s3"
+                },
+                {
+                    id: 5,
+                    title: "IAM Menu",
+                    description: "Seamlessly manage IAM with these core features",
+                    image: "assets/iam_management.png",
+                    category: "iam"
+                },
+                {
+                    id: 6,
+                    title: "S3 MFA Delete",
+                    description: "S3 MFA Enable/Disable within a flash",
+                    image: "assets/s3_mfa_delete.png",
                     category: "s3"
                 }
             ];
@@ -581,4 +598,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add this to your existing page load functions
     loadScreenshots();
+
+    // Initialize expand/collapse for changelog
+    document.querySelectorAll('.expand-changes').forEach(button => {
+        button.addEventListener('click', function() {
+            const changeList = this.previousElementSibling;
+            changeList.classList.toggle('collapsed');
+            this.textContent = changeList.classList.contains('collapsed') ? 'Show more' : 'Show less';
+            
+            // Scroll a bit to show more items when expanded
+            if (!changeList.classList.contains('collapsed')) {
+                window.scrollBy({
+                    top: 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
 }); 
