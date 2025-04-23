@@ -116,32 +116,30 @@ document.addEventListener('DOMContentLoaded', function() {
         section.classList.add('reveal');
     });
 
-    // Function to load and render features
-    async function loadFeatures() {
-        const fallbackFeatures = {
-            features: [
-                {
-                    icon: "fa-user-shield",
-                    title: "IAM Management",
-                    description: "Easily manage IAM users, groups, and permissions through an intuitive interface."
-                },
-                {
-                    icon: "fa-server",
-                    title: "EC2 Control",
-                    description: "Monitor and manage EC2 instances with simple commands (Coming Soon)."
-                },
-                {
-                    icon: "fa-database",
-                    title: "S3 Operations",
-                    description: "Create, list, and manage S3 buckets effortlessly."
-                },
-                {
-                    icon: "fa-terminal",
-                    title: "CLI Interface",
-                    description: "Beautiful terminal UI with intuitive navigation and clear feedback."
-                }
-            ]
-        };
+    // Function to load and render features - directly use hardcoded data
+    function loadFeatures() {
+        const features = [
+            {
+                icon: "fa-user-shield",
+                title: "IAM Management",
+                description: "Easily manage IAM users, groups, and permissions through an intuitive interface."
+            },
+            {
+                icon: "fa-server",
+                title: "EC2 Control",
+                description: "Monitor and manage EC2 instances with simple commands (Coming Soon)."
+            },
+            {
+                icon: "fa-database",
+                title: "S3 Operations",
+                description: "Create, list, and manage S3 buckets effortlessly."
+            },
+            {
+                icon: "fa-terminal",
+                title: "CLI Interface",
+                description: "Beautiful terminal UI with intuitive navigation and clear feedback."
+            }
+        ];
 
         const featureGrid = document.getElementById('feature-grid');
         if (!featureGrid) {
@@ -149,15 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        try {
-            // Try to fetch features from JSON file
-            const response = await fetch('data/features.json');
-            const data = await response.json();
-            renderFeatures(data.features);
-        } catch (error) {
-            console.warn('Falling back to default features:', error);
-            renderFeatures(fallbackFeatures.features);
-        }
+        renderFeatures(features);
     }
 
     // Separate function to render features
@@ -182,46 +172,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to load and render notices
-    async function loadNotices() {
+    // Function to load and render notices - directly use hardcoded data
+    function loadNotices() {
         const noticeContainer = document.getElementById('notice-container');
         if (!noticeContainer) return;
 
-        try {
-            const response = await fetch('data/noticeboard.json');
-            const data = await response.json();
-            renderNotices(data.notices);
-        } catch (error) {
-            console.warn('Error loading notices:', error);
-            noticeContainer.innerHTML = `
-                <div class="notice-card notice-type-update">
-                    <div class="notice-header">
-                        <div class="notice-title">
-                            <i class="fas fa-bell"></i>
-                            First Stable Release
-                        </div>
-                        <div class="notice-date">2025-03</div>
+        noticeContainer.innerHTML = `
+            <div class="notice-card notice-type-update">
+                <div class="notice-header">
+                    <div class="notice-title">
+                        <i class="fas fa-bell"></i>
+                        First Stable Release
                     </div>
-                    <div class="notice-message">
-                        We are excited to announce the first stable release of AWSMGR v1.0.0! This release includes 
-                        complete IAM user management capabilities including password management, S3 operations, 
-                        and a refined user interface.
-                    </div>
+                    <div class="notice-date">2025-03</div>
                 </div>
-                <div class="notice-card notice-type-info">
-                    <div class="notice-header">
-                        <div class="notice-title">
-                            <i class="fas fa-info-circle"></i>
-                            Platform Support
-                        </div>
-                        <div class="notice-date">2025-03</div>
-                    </div>
-                    <div class="notice-message">
-                        Currently available for Linux. Windows support coming soon!
-                    </div>
+                <div class="notice-message">
+                    We are excited to announce the first stable release of AWSMGR v1.0.0! This release includes 
+                    complete IAM user management capabilities including password management, S3 operations, 
+                    and a refined user interface.
                 </div>
-            `;
-        }
+            </div>
+            <div class="notice-card notice-type-info">
+                <div class="notice-header">
+                    <div class="notice-title">
+                        <i class="fas fa-info-circle"></i>
+                        Platform Support
+                    </div>
+                    <div class="notice-date">2025-02</div>
+                </div>
+                <div class="notice-message">
+                    Currently available for Linux. Windows support coming soon!
+                </div>
+            </div>
+        `;
     }
 
     function renderNotices(notices) {
@@ -253,62 +236,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add this function after loadNotices()
-    async function loadTodos() {
+    // Function to load roadmap items - directly use hardcoded data
+    function loadTodos() {
         const todoContainer = document.getElementById('todo-container');
         if (!todoContainer) return;
 
-        try {
-            // Add logging to see if the fetch is being attempted
-            console.log('Attempting to fetch todo.json...');
-            const response = await fetch('data/todo.json');
-            
-            // Check if the response is OK
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        const todos = [
+            {
+                task: "Improve design",
+                status: "in-progress",
+                priority: "high"
+            },
+            {
+                task: "Add EC2 support",
+                status: "planned",
+                priority: "high"
+            },
+            {
+                task: "Add user policy support",
+                status: "planned",
+                priority: "medium"
             }
-            
-            console.log('Todo data received, parsing JSON...');
-            const data = await response.json();
-            console.log('Todo data parsed:', data);
-            renderTodos(data.todos);
-        } catch (error) {
-            console.warn('Error loading todos:', error);
-            
-            // Display a more helpful error message
-            todoContainer.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Failed to load roadmap items</p>
-                    <small>Error details: ${error.message}</small>
-                </div>
-            `;
-            
-            // Fallback to hardcoded todos - remove the IAM user password management
-            const fallbackTodos = [
-                {
-                    task: "Improve design",
-                    status: "in-progress",
-                    priority: "high"
-                },
-                {
-                    task: "Add EC2 support",
-                    status: "planned",
-                    priority: "high"
-                },
-                {
-                    task: "Add user policy support",
-                    status: "planned",
-                    priority: "medium"
-                }
-            ];
-            
-            // After a short delay, render the fallback todos
-            setTimeout(() => {
-                console.log('Using fallback todo data');
-                renderTodos(fallbackTodos);
-            }, 1000);
-        }
+        ];
+        
+        renderTodos(todos);
     }
 
     function renderTodos(todos) {
@@ -341,84 +292,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add this near your other page load functions
 
-    async function loadScreenshots() {
+    // Function to load screenshots - directly use hardcoded data
+    function loadScreenshots() {
         const screenshotsGrid = document.getElementById('screenshots-grid');
         if (!screenshotsGrid) return;
 
-        try {
-            console.log('Attempting to fetch assets.json...');
-            const response = await fetch('data/assets.json');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        const screenshots = [
+            {
+                id: 1,
+                title: "Main Menu",
+                description: "AWS CLI Manager main interface showing available services",
+                image: "assets/main_menu.png",
+                category: "interface"
+            },
+            {
+                id: 2,
+                title: "IAM Users List",
+                description: "View and manage all IAM users in your AWS account",
+                image: "assets/list_iam_users.png",
+                category: "iam"
+            },
+            {
+                id: 3,
+                title: "IAM Groups List",
+                description: "Manage IAM groups and their associated permissions",
+                image: "assets/list_iam_groups.png",
+                category: "iam"
+            },
+            {
+                id: 4,
+                title: "S3 Menu",
+                description: "S3 bucket management options for creating, listing and managing storage",
+                image: "assets/s3_menu.png",
+                category: "s3"
+            },
+            {
+                id: 5,
+                title: "IAM Menu",
+                description: "Seamlessly manage IAM with these core features",
+                image: "assets/iam_management.png",
+                category: "iam"
+            },
+            {
+                id: 6,
+                title: "S3 MFA Delete",
+                description: "S3 MFA Enable/Disable within a flash",
+                image: "assets/s3_mfa_delete.png",
+                category: "s3"
             }
-            
-            console.log('Screenshot data received, parsing JSON...');
-            const data = await response.json();
-            
-            // Remove loading spinner
-            screenshotsGrid.innerHTML = '';
-            
-            // Render screenshots
-            renderScreenshots(data.screenshots);
-            
-            // Set up full screen preview (keep this functionality)
-            setupFullscreenPreview();
-        } catch (error) {
-            console.warn('Error loading screenshots:', error);
-            
-            // Create fallback screenshots
-            const fallbackScreenshots = [
-                {
-                    id: 1,
-                    title: "Main Menu",
-                    description: "AWS CLI Manager main interface showing available services",
-                    image: "assets/main_menu.png",
-                    category: "interface"
-                },
-                {
-                    id: 2,
-                    title: "IAM Users List",
-                    description: "View and manage all IAM users in your AWS account",
-                    image: "assets/list_iam_users.png",
-                    category: "iam"
-                },
-                {
-                    id: 3,
-                    title: "IAM Groups List",
-                    description: "Manage IAM groups and their associated permissions",
-                    image: "assets/list_iam_groups.png",
-                    category: "iam"
-                },
-                {
-                    id: 4,
-                    title: "S3 Menu",
-                    description: "S3 bucket management options for creating, listing and managing storage",
-                    image: "assets/s3_menu.png",
-                    category: "s3"
-                },
-                {
-                    id: 5,
-                    title: "IAM Menu",
-                    description: "Seamlessly manage IAM with these core features",
-                    image: "assets/iam_management.png",
-                    category: "iam"
-                },
-                {
-                    id: 6,
-                    title: "S3 MFA Delete",
-                    description: "S3 MFA Enable/Disable within a flash",
-                    image: "assets/s3_mfa_delete.png",
-                    category: "s3"
-                }
-            ];
-            
-            screenshotsGrid.innerHTML = ''; // Clear error
-            renderScreenshots(fallbackScreenshots);
-            setupFullscreenPreview();
-            
-            console.log('Using fallback screenshot data');
-        }
+        ];
+        
+        screenshotsGrid.innerHTML = ''; // Clear any existing content
+        renderScreenshots(screenshots);
+        setupFullscreenPreview();
     }
 
     function renderScreenshots(screenshots) {
